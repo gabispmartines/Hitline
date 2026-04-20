@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
+<title>HitLine — Music Timeline Battle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#07070F;--bg1:#0D0D1C;--bg2:#131326;--bg3:#191934;
+  --b0:#1E1E38;--b1:#28284A;--b2:#38385A;
+  --t0:#F0F0FF;--t1:#A0A0CC;--t2:#555575;--t3:#2A2A45;
+  --v1:#7C3AED;--v2:#4F46E5;--v3:#2563EB;--vm:#5B48F2;
+  --ok:#10B981;--okd:#041F14;--er:#EF4444;--erd:#1C0505;
+  --go:#F59E0B;--god:#3B1F06;
+  --fh:'Syne',sans-serif;--fb:'DM Sans',sans-serif;
+  --r1:8px;--r2:14px;--r3:20px;--r4:28px;--rf:999px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--bg);color:var(--t0);font-family:var(--fb);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+button{cursor:pointer;border:none;background:none;font-family:inherit;color:inherit}
+input{font-family:inherit;color:inherit}
+::-webkit-scrollbar{width:3px;height:3px}
+::-webkit-scrollbar-thumb{background:var(--b1);border-radius:2px}
+body::before{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(ellipse 60% 40% at 20% -5%,rgba(124,58,237,.22) 0%,transparent 65%),
+    radial-gradient(ellipse 50% 30% at 85% 108%,rgba(37,99,235,.18) 0%,transparent 60%);
+}
+#app{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;align-items:center}
+.screen{width:100%;max-width:560px;min-height:100vh;padding:28px 18px 64px;display:none;flex-direction:column;gap:18px}
+.screen.active{display:flex;animation:sIn .3s cubic-bezier(.22,1,.36,1) both}
+@keyframes sIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.eyebrow{font-size:9px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--t2)}
+.gtext{background:linear-gradient(135deg,#C4B5FD,#93C5FD);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.surface{background:var(--bg1);border:1px solid var(--b1);border-radius:var(--r4);padding:20px}
+.divider{height:1px;background:var(--b0)}
+.btn{width:100%;padding:14px 18px;border-radius:var(--r3);font-family:var(--fh);font-size:15px;font-weight:700;letter-spacing:.04em;transition:opacity .15s,transform .15s,box-shadow .15s;cursor:pointer}
+.btn-p{background:linear-gradient(135deg,var(--v1),var(--v3));color:#fff;box-shadow:0 4px 22px rgba(91,72,242,.4)}
+.btn-p:hover{opacity:.9;transform:translateY(-1px);box-shadow:0 6px 30px rgba(91,72,242,.55)}
+.btn-p:active{transform:none}
+.btn-g{background:var(--bg1);color:var(--t1);border:1.5px solid var(--b1)}
+.btn-g:hover{border-color:var(--b2);color:var(--t0);background:var(--bg2)}
+.btn:disabled{opacity:.35;cursor:not-allowed;transform:none!important;box-shadow:none!important}
+.hidden{display:none!important}
+
+/* SETUP */
+#screen-setup{justify-content:center;align-items:center;text-align:center;gap:22px}
+.logo-wrap{display:flex;flex-direction:column;align-items:center;gap:14px}
+.logo-orb{width:86px;height:86px;border-radius:24px;background:linear-gradient(135deg,var(--v1),var(--v3));display:flex;align-items:center;justify-content:center;font-size:44px;box-shadow:0 0 0 1px rgba(124,58,237,.3),0 8px 40px rgba(91,72,242,.5);animation:orbGlow 3s ease-in-out infinite}
+@keyframes orbGlow{0%,100%{box-shadow:0 0 0 1px rgba(124,58,237,.3),0 8px 40px rgba(91,72,242,.5)}50%{box-shadow:0 0 0 1px rgba(124,58,237,.5),0 8px 56px rgba(91,72,242,.7)}}
+.logo-name{font-family:var(--fh);font-size:54px;font-weight:800;letter-spacing:-.05em;line-height:1}
+.logo-sub{font-size:10px;color:var(--t2);letter-spacing:.22em;text-transform:uppercase}
+.count-row{display:flex;gap:10px;margin-top:10px}
+.cnt-btn{flex:1;height:54px;border-radius:var(--r2);background:var(--bg2);border:1.5px solid var(--b1);font-family:var(--fh);font-size:22px;font-weight:800;color:var(--t1);cursor:pointer;transition:border-color .15s,color .15s,background .15s,box-shadow .15s}
+.cnt-btn:hover{border-color:var(--b2);color:var(--t0)}
+.cnt-btn.on{background:linear-gradient(135deg,var(--v1),var(--v3));border-color:transparent;color:#fff;box-shadow:0 4px 16px rgba(91,72,242,.4)}
+.names-grid{display:flex;flex-direction:column;gap:10px;margin-top:10px}
+.name-row{display:flex;align-items:center;gap:12px}
+.name-av{width:36px;height:36px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;color:#fff}
+.name-inp{flex:1;background:var(--bg2);border:1.5px solid var(--b1);border-radius:var(--r2);padding:11px 14px;font-size:14px;font-weight:500;outline:none;transition:border-color .2s}
+.name-inp:focus{border-color:var(--vm)}
+.name-inp::placeholder{color:var(--t3)}
+.rules{display:flex;flex-direction:column;gap:10px;margin-top:10px}
+.rule-row{display:flex;align-items:flex-start;gap:12px;text-align:left}
+.rule-ico{width:32px;height:32px;border-radius:var(--r1);background:var(--bg2);border:1px solid var(--b1);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.rule-txt{font-size:13px;color:var(--t1);line-height:1.55;padding-top:5px}
+.setup-foot{color:var(--t3);font-size:11px;letter-spacing:.06em}
+
+/* GAME */
+#screen-game{padding:0;gap:0;max-width:100%}
+.topbar{position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:11px 16px;background:rgba(7,7,15,.88);backdrop-filter:blur(16px);border-bottom:1px solid var(--b0);width:100%}
+.tb-pill{display:flex;align-items:center;gap:6px;background:var(--bg2);border:1px solid var(--b1);border-radius:var(--rf);padding:5px 12px;font-size:12px;font-weight:600;color:var(--t1)}
+.tb-dot{width:6px;height:6px;border-radius:50%;background:var(--ok);animation:dotBlink 2s ease-in-out infinite}
+@keyframes dotBlink{0%,100%{opacity:1}50%{opacity:.3}}
+.quit-btn{color:var(--t2);font-size:12px;font-weight:600;padding:5px 10px;border-radius:var(--r1);transition:color .15s}
+.quit-btn:hover{color:var(--er)}
+.pbar{display:flex;border-bottom:1px solid var(--b0);background:rgba(13,13,28,.7);width:100%;overflow-x:auto}
+.ptab{flex:1;min-width:75px;display:flex;flex-direction:column;align-items:center;gap:5px;padding:11px 8px;border-right:1px solid var(--b0);position:relative;transition:background .2s}
+.ptab:last-child{border-right:none}
+.ptab.on{background:var(--bg2)}
+.ptab-av{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#fff;transition:transform .2s}
+.ptab.on .ptab-av{transform:scale(1.1)}
+.ptab-name{font-size:10px;font-weight:600;color:var(--t2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:68px}
+.ptab.on .ptab-name{color:var(--t0)}
+.ptab-sc{font-size:10px;font-weight:700;color:var(--vm);background:rgba(91,72,242,.15);border:1px solid rgba(91,72,242,.25);border-radius:var(--rf);padding:1px 7px}
+.ptab-bar{position:absolute;bottom:0;left:20%;width:60%;height:2px;background:linear-gradient(90deg,var(--v1),var(--v3));border-radius:2px 2px 0 0;opacity:0;transition:opacity .2s}
+.ptab.on .ptab-bar{opacity:1}
+.gbody{flex:1;display:flex;flex-direction:column;gap:16px;padding:16px 16px 100px;max-width:560px;margin:0 auto;width:100%}
+.turn-lbl{display:flex;justify-content:center}
+.turn-badge{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,var(--v1),var(--v3));border-radius:var(--rf);padding:6px 18px;font-family:var(--fh);font-size:13px;font-weight:700;letter-spacing:.04em;color:#fff;box-shadow:0 2px 12px rgba(91,72,242,.35)}
+
+/* Card */
+.card-stage{display:flex;flex-direction:column;align-items:center;gap:12px}
+.card-wrap{width:148px;height:196px;perspective:1200px;cursor:pointer;position:relative}
+.card-inner{width:100%;height:100%;position:relative;transform-style:preserve-3d;transition:transform .55s cubic-bezier(.4,0,.2,1)}
+.card-wrap.flipped .card-inner{transform:rotateY(180deg)}
+.cface{position:absolute;inset:0;border-radius:18px;backface-visibility:hidden;-webkit-backface-visibility:hidden;overflow:hidden}
+.cfront{background:linear-gradient(145deg,var(--bg2),var(--bg1));border:1px solid var(--b1);display:flex;flex-direction:column;box-shadow:0 8px 32px rgba(0,0,0,.55),0 2px 8px rgba(0,0,0,.3)}
+.cg-stripe{display:flex;align-items:center;gap:6px;padding:9px 13px 8px;border-bottom:1px solid rgba(255,255,255,.05)}
+.cg-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.cg-lbl{font-size:8px;font-weight:700;letter-spacing:1.6px;text-transform:uppercase}
+.cfront-body{flex:1;display:flex;flex-direction:column;justify-content:center;padding:13px;position:relative;overflow:hidden}
+.cwm{position:absolute;right:-10px;bottom:-10px;font-size:90px;line-height:1;opacity:.05;pointer-events:none;user-select:none;font-family:serif}
+.ctitle{font-family:var(--fh);font-size:16px;font-weight:800;color:var(--t0);letter-spacing:-.02em;line-height:1.25;margin-bottom:9px;position:relative;z-index:1;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.csep{width:26px;height:2px;border-radius:1px;background:rgba(255,255,255,.18);margin-bottom:9px}
+.cartist{font-size:10px;font-weight:500;color:rgba(255,255,255,.48);letter-spacing:.06em;text-transform:uppercase;position:relative;z-index:1;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.cfront-foot{padding:9px 13px;border-top:1px solid rgba(255,255,255,.05);text-align:center}
+.flip-hint{font-size:8.5px;letter-spacing:1.4px;text-transform:uppercase;color:rgba(255,255,255,.22)}
+.cback{transform:rotateY(180deg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;box-shadow:0 8px 32px rgba(0,0,0,.55)}
+.cback-year{font-family:var(--fh);font-size:56px;font-weight:800;letter-spacing:-.05em;line-height:1;color:#fff;text-align:center}
+.cback-decade{font-size:8px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.42);margin-top:5px;margin-bottom:13px}
+.cback-sep{width:32px;height:2px;border-radius:1px;background:rgba(255,255,255,.28);margin-bottom:13px}
+.cback-title{font-family:var(--fh);font-size:12px;font-weight:700;color:rgba(255,255,255,.88);text-align:center;padding:0 12px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.cverdict{position:absolute;top:11px;right:11px;width:27px;height:27px;border-radius:50%;background:rgba(255,255,255,.22);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff}
+.card-prompt{font-size:12px;color:var(--t2);letter-spacing:.04em;text-align:center}
+.card-prompt.act{color:var(--vm);animation:pp 1.5s ease-in-out infinite}
+@keyframes pp{0%,100%{opacity:.7}50%{opacity:1}}
+.confirm-bar{position:fixed;bottom:0;left:0;right:0;z-index:40;padding:12px 18px 22px;background:linear-gradient(to top,var(--bg) 60%,transparent);display:flex;justify-content:center}
+.confirm-bar-in{width:100%;max-width:524px}
+
+/* Timeline */
+.tl-section{display:flex;flex-direction:column;gap:7px}
+.tl-head{display:flex;justify-content:space-between;align-items:center;padding:0 4px}
+.tl-count{font-size:11px;font-weight:600;color:var(--vm)}
+.tl-hint{text-align:center;font-size:11px;color:var(--t2);animation:hf 2s ease-in-out infinite}
+@keyframes hf{0%,100%{opacity:.6}50%{opacity:1}}
+.tl-scroll{overflow-x:auto;padding:5px 0 10px}
+.tl-track{display:flex;align-items:center;min-width:max-content;padding:0 14px;position:relative}
+.tl-track::before{content:'';position:absolute;top:50%;left:14px;right:14px;height:2px;background:var(--b0);transform:translateY(-50%);z-index:0}
+.tlc{position:relative;z-index:1;width:108px;height:140px;border-radius:13px;flex-shrink:0;overflow:hidden;box-shadow:0 4px 14px rgba(0,0,0,.45);transition:transform .15s}
+.tlc:hover{transform:translateY(-3px)}
+.tlc-in{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:9px;border:1px solid rgba(255,255,255,.08);border-radius:13px}
+.tlc-yr{font-family:var(--fh);font-size:24px;font-weight:800;letter-spacing:-.04em;line-height:1;color:#fff;text-align:center}
+.tlc-sep{width:22px;height:1.5px;border-radius:1px;margin:5px 0}
+.tlc-title{font-size:9.5px;font-weight:600;color:rgba(255,255,255,.78);text-align:center;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.iz{position:relative;z-index:2;width:36px;height:140px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+.iz-dot{width:10px;height:10px;border-radius:50%;background:var(--b1);border:2px solid var(--b0);transition:transform .2s,background .2s,box-shadow .2s}
+.iz:hover .iz-dot{background:var(--vm);transform:scale(1.5);box-shadow:0 0 8px rgba(91,72,242,.6)}
+.iz-arrow{display:none;width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--v1),var(--v3));align-items:center;justify-content:center;font-family:var(--fh);font-size:13px;font-weight:800;color:#fff;box-shadow:0 2px 10px rgba(91,72,242,.55);animation:izPop .2s cubic-bezier(.175,.885,.32,1.275) both}
+@keyframes izPop{from{transform:scale(0)}to{transform:scale(1)}}
+.iz.sel .iz-dot{display:none}
+.iz.sel .iz-arrow{display:flex}
+.others{display:flex;flex-direction:column;gap:10px}
+.ocard{background:var(--bg1);border:1px solid var(--b0);border-radius:var(--r3);overflow:hidden}
+.ocard-head{display:flex;justify-content:space-between;align-items:center;padding:9px 14px 7px}
+.ocard-name{font-size:11px;font-weight:700;color:var(--t1);text-transform:uppercase;letter-spacing:.08em}
+.ocard-score{font-size:11px;font-weight:700;color:var(--vm)}
+
+/* Reveal overlay */
+.rev-ov{position:fixed;inset:0;z-index:200;background:rgba(7,7,15,.84);backdrop-filter:blur(12px);display:none;align-items:center;justify-content:center;padding:22px}
+.rev-ov.show{display:flex;animation:rFade .2s ease both}
+@keyframes rFade{from{opacity:0}to{opacity:1}}
+.rev-card{width:100%;max-width:350px;display:flex;flex-direction:column;gap:13px;animation:rPop .35s cubic-bezier(.175,.885,.32,1.275) both}
+@keyframes rPop{from{opacity:0;transform:scale(.88) translateY(22px)}to{opacity:1;transform:none}}
+.rev-badge{display:inline-flex;align-items:center;gap:7px;padding:7px 20px;border-radius:var(--rf);font-family:var(--fh);font-size:15px;font-weight:700;letter-spacing:.04em;color:#fff;align-self:center}
+.rev-badge.ok{background:linear-gradient(135deg,#059669,#047857);box-shadow:0 4px 14px rgba(5,150,105,.45)}
+.rev-badge.er{background:linear-gradient(135deg,#DC2626,#991B1B);box-shadow:0 4px 14px rgba(220,38,38,.45)}
+.rev-inner{border-radius:var(--r4);padding:24px 20px;border:1px solid var(--b1)}
+.rev-inner.ok{background:var(--okd);border-color:rgba(16,185,129,.22)}
+.rev-inner.er{background:var(--erd);border-color:rgba(239,68,68,.22)}
+.rev-yr-block{text-align:center;margin-bottom:16px}
+.rev-yr-lbl{font-size:8.5px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--t2);margin-bottom:5px}
+.rev-yr{font-family:var(--fh);font-size:68px;font-weight:800;letter-spacing:-.05em;line-height:1;color:var(--t0)}
+.rev-div{height:1px;background:var(--b1);margin-bottom:14px}
+.rev-stitle{font-family:var(--fh);font-size:19px;font-weight:800;color:var(--t0);letter-spacing:-.02em;margin-bottom:5px}
+.rev-artist{font-size:11px;font-weight:500;color:var(--t1);text-transform:uppercase;letter-spacing:.1em}
+.rev-note{margin-top:11px;padding:9px 12px;background:rgba(0,0,0,.28);border-radius:var(--r2);font-size:11px;color:var(--t1);text-align:center}
+.rev-scrow{display:flex;justify-content:space-between;align-items:center;margin-top:11px;padding-top:11px;border-top:1px solid var(--b1)}
+.rev-sc-lbl{font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--t2)}
+.rev-sc-val{font-family:var(--fh);font-size:22px;font-weight:800;color:var(--ok)}
+
+/* WIN */
+#screen-win{padding-top:32px;gap:20px}
+.win-hero{display:flex;flex-direction:column;align-items:center;gap:13px;text-align:center;position:relative}
+.win-glow{position:absolute;width:240px;height:240px;border-radius:50%;top:-70px;background:var(--go);opacity:.07;filter:blur(38px);pointer-events:none}
+.win-trophy{position:relative;z-index:1;width:94px;height:94px;border-radius:24px;background:linear-gradient(135deg,#F59E0B,#D97706);display:flex;align-items:center;justify-content:center;font-size:50px;box-shadow:0 0 0 1px rgba(245,158,11,.3),0 8px 40px rgba(245,158,11,.45)}
+.win-title{font-family:var(--fh);font-size:40px;font-weight:800;letter-spacing:-.04em;position:relative;z-index:1}
+.win-sub{font-size:15px;color:var(--t1);position:relative;z-index:1;line-height:1.6}
+.win-name{color:var(--t0);font-weight:800}
+.sboard{display:flex;flex-direction:column;gap:9px}
+.srow{display:flex;align-items:center;gap:11px;padding:13px 15px;border-radius:var(--r3);background:var(--bg2);border:1px solid var(--b1);position:relative;overflow:hidden}
+.srow.wr{border-color:rgba(245,158,11,.35)}
+.srow.wr::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(245,158,11,.1) 0%,transparent 60%)}
+.srow-med{font-size:20px;width:28px;text-align:center;flex-shrink:0}
+.srow-av{width:34px;height:34px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:#fff}
+.srow-info{flex:1;min-width:0}
+.srow-name{font-family:var(--fh);font-size:15px;font-weight:700;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.srow.wr .srow-name{color:#fff}
+.srow-rank{display:inline-block;font-size:8.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;border:1px solid;border-radius:var(--rf);padding:1px 8px;margin-top:3px}
+.srow-num{font-family:var(--fh);font-size:27px;font-weight:800;letter-spacing:-.03em;flex-shrink:0;color:var(--t1)}
+.srow.wr .srow-num{color:#F59E0B}
+.srow-den{font-size:13px;color:var(--t2);font-weight:500}
+.win-tls{display:flex;flex-direction:column;gap:11px}
+.win-tl-row{display:flex;flex-direction:column;gap:5px}
+.win-tl-name{font-size:9px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.12em;padding:0 3px}
+.win-tl-chips{display:flex;gap:5px;flex-wrap:wrap}
+.win-chip{background:var(--bg2);border:1px solid var(--b1);border-radius:6px;padding:3px 8px;font-family:var(--fh);font-size:11px;font-weight:700}
+.win-actions{display:flex;flex-direction:column;gap:10px}
+
+/* Toast */
+.toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(60px);background:var(--bg3);border:1px solid var(--b1);border-radius:var(--rf);padding:10px 22px;font-size:13px;font-weight:500;color:var(--t0);box-shadow:0 8px 30px rgba(0,0,0,.45);z-index:500;transition:transform .3s cubic-bezier(.175,.885,.32,1.275),opacity .3s;pointer-events:none;white-space:nowrap;opacity:0}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+</style>
+</head>
+<body>
+<div id="app">
+
+<div id="screen-setup" class="screen active">
+  <div class="logo-wrap">
+    <div class="logo-orb">♪</div>
+    <div class="logo-name gtext">HitLine</div>
+    <div class="logo-sub">Music Timeline Battle</div>
+  </div>
+  <div class="surface">
+    <div class="eyebrow">Número de Jogadores</div>
+    <div class="count-row">
+      <button class="cnt-btn" onclick="setPC(1)">1</button>
+      <button class="cnt-btn on" onclick="setPC(2)">2</button>
+      <button class="cnt-btn" onclick="setPC(3)">3</button>
+      <button class="cnt-btn" onclick="setPC(4)">4</button>
+    </div>
+    <div class="divider" style="margin:16px 0"></div>
+    <div class="eyebrow">Nomes dos Jogadores</div>
+    <div class="names-grid" id="names-grid"></div>
+    <div class="divider" style="margin:16px 0"></div>
+    <div class="eyebrow">Como Jogar</div>
+    <div class="rules">
+      <div class="rule-row"><div class="rule-ico">🎵</div><div class="rule-txt">Veja o título e artista — o ano está oculto</div></div>
+      <div class="rule-row"><div class="rule-ico">📍</div><div class="rule-txt">Clique em um espaço na linha do tempo para posicionar</div></div>
+      <div class="rule-row"><div class="rule-ico">🔄</div><div class="rule-txt">Clique na carta para fazer o flip e revelar o ano</div></div>
+      <div class="rule-row"><div class="rule-ico">🏆</div><div class="rule-txt">Primeiro a acertar 10 posicionamentos vence!</div></div>
+    </div>
+  </div>
+  <button class="btn btn-p" onclick="startGame()">▶  Começar Jogo</button>
+  <div class="setup-foot">250 músicas · Brasileiras + Internacionais · Anos 40–2020s</div>
+</div>
+
+<div id="screen-game" class="screen">
+  <div class="topbar">
+    <div class="tb-pill"><div class="tb-dot"></div><span id="deck-ct">—</span></div>
+    <button class="quit-btn" onclick="quitGame()">✕ Sair</button>
+  </div>
+  <div class="pbar" id="pbar"></div>
+  <div class="gbody">
+    <div class="turn-lbl"><div class="turn-badge" id="turn-badge">—</div></div>
+    <div class="card-stage">
+      <div class="card-wrap" id="main-card" onclick="onCardClick()">
+        <div class="card-inner" id="card-inner">
+          <div class="cface cfront">
+            <div class="cg-stripe" id="cg-stripe">
+              <div class="cg-dot" id="cg-dot"></div>
+              <span class="cg-lbl" id="cg-lbl"></span>
+            </div>
+            <div class="cfront-body">
+              <div class="cwm">♪</div>
+              <div class="ctitle" id="ctitle">—</div>
+              <div class="csep"></div>
+              <div class="cartist" id="cartist">—</div>
+            </div>
+            <div class="cfront-foot"><div class="flip-hint" id="flip-hint">posicione primeiro ↓</div></div>
+          </div>
+          <div class="cface cback" id="cback">
+            <div class="cback-year" id="cback-yr">—</div>
+            <div class="cback-decade" id="cback-dec">—</div>
+            <div class="cback-sep"></div>
+            <div class="cback-title" id="cback-title">—</div>
+            <div class="cverdict" id="cverdict"></div>
+          </div>
+        </div>
+      </div>
+      <div class="card-prompt" id="cprompt">Escolha uma posição na linha do tempo ↓</div>
+    </div>
+    <div class="tl-section">
+      <div class="tl-head">
+        <div class="eyebrow">Sua Linha do Tempo</div>
+        <div class="tl-count" id="tl-count">—</div>
+      </div>
+      <div class="tl-hint" id="tl-hint">← clique em um espaço para posicionar →</div>
+      <div class="tl-scroll"><div class="tl-track" id="tl-track"></div></div>
+    </div>
+    <div class="others" id="others"></div>
+  </div>
+  <div class="confirm-bar">
+    <div class="confirm-bar-in">
+      <button class="btn btn-p" id="conf-btn" onclick="flipCard()" disabled>Selecione uma posição primeiro</button>
+    </div>
+  </div>
+</div>
+
+<div id="screen-win" class="screen">
+  <div class="win-hero">
+    <div class="win-glow"></div>
+    <div class="win-trophy">🏆</div>
+    <div class="win-title">Fim de Jogo!</div>
+    <div class="win-sub" id="win-sub">—</div>
+  </div>
+  <div>
+    <div class="eyebrow" style="margin-bottom:12px">Classificação Final</div>
+    <div class="sboard" id="sboard"></div>
+  </div>
+  <div class="surface win-tls" id="win-tls-wrap">
+    <div class="eyebrow" style="margin-bottom:14px">Linhas do Tempo Finais</div>
+    <div id="win-tls"></div>
+  </div>
+  <div class="win-actions">
+    <button class="btn btn-p" onclick="restartGame()">▶  Jogar Novamente</button>
+    <button class="btn btn-g" onclick="goSetup()">⟳  Nova Configuração</button>
+  </div>
+</div>
+
+</div>
+
+<div class="rev-ov" id="rev-ov">
+  <div class="rev-card">
+    <div class="rev-badge" id="rev-badge">—</div>
+    <div class="rev-inner" id="rev-inner">
+      <div class="rev-yr-block">
+        <div class="rev-yr-lbl">ANO DE LANÇAMENTO</div>
+        <div class="rev-yr" id="rev-yr">—</div>
+      </div>
+      <div class="rev-div"></div>
+      <div class="rev-stitle" id="rev-stitle">—</div>
+      <div class="rev-artist" id="rev-artist">—</div>
+      <div class="rev-note hidden" id="rev-note"></div>
+      <div class="rev-scrow hidden" id="rev-scrow">
+        <div class="rev-sc-lbl">Pontuação</div>
+        <div class="rev-sc-val" id="rev-scval">—</div>
+      </div>
+    </div>
+    <button class="btn btn-p" onclick="closeReveal()">Continuar →</button>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+
+const DB=[
+  {id:'001',t:'Aquarela do Brasil',a:'Ary Barroso',y:1939,g:'samba'},
+  {id:'002',t:'Asa Branca',a:'Luiz Gonzaga',y:1947,g:'forró'},
+  {id:'003',t:'Garota de Ipanema',a:'Tom Jobim',y:1962,g:'bossa nova'},
+  {id:'004',t:'Travessia',a:'Milton Nascimento',y:1967,g:'mpb'},
+  {id:'005',t:'Hey Jude',a:'The Beatles',y:1968,g:'rock'},
+  {id:'006',t:'Respect',a:'Aretha Franklin',y:1967,g:'soul'},
+  {id:'007',t:'Good Vibrations',a:'The Beach Boys',y:1966,g:'pop'},
+  {id:'008',t:'Like a Rolling Stone',a:'Bob Dylan',y:1965,g:'rock'},
+  {id:'009',t:'Gimme Shelter',a:'The Rolling Stones',y:1969,g:'rock'},
+  {id:'010',t:'A Whiter Shade of Pale',a:'Procol Harum',y:1967,g:'rock'},
+  {id:'011',t:'Bohemian Rhapsody',a:'Queen',y:1975,g:'rock'},
+  {id:'012',t:'Hotel California',a:'Eagles',y:1977,g:'rock'},
+  {id:'013',t:'Stairway to Heaven',a:'Led Zeppelin',y:1971,g:'rock'},
+  {id:'014',t:'Superstition',a:'Stevie Wonder',y:1972,g:'funk'},
+  {id:'015',t:"Stayin' Alive",a:'Bee Gees',y:1977,g:'disco'},
+  {id:'016',t:'I Will Survive',a:'Gloria Gaynor',y:1978,g:'disco'},
+  {id:'017',t:'Dancing Queen',a:'ABBA',y:1976,g:'pop'},
+  {id:'018',t:'Roxanne',a:'The Police',y:1978,g:'rock'},
+  {id:'019',t:'Le Freak',a:'Chic',y:1978,g:'disco'},
+  {id:'020',t:'Waterloo',a:'ABBA',y:1974,g:'pop'},
+  {id:'021',t:'Como Nossos Pais',a:'Elis Regina',y:1976,g:'mpb'},
+  {id:'022',t:'Dreams',a:'Fleetwood Mac',y:1977,g:'rock'},
+  {id:'023',t:'September',a:'Earth Wind & Fire',y:1978,g:'funk'},
+  {id:'024',t:'O Bêbado e a Equilibrista',a:'Elis Regina',y:1979,g:'mpb'},
+  {id:'025',t:'Killing Me Softly',a:'Roberta Flack',y:1973,g:'soul'},
+  {id:'026',t:"Let's Stay Together",a:'Al Green',y:1971,g:'soul'},
+  {id:'027',t:'Flor de Lis',a:'Djavan',y:1976,g:'mpb'},
+  {id:'028',t:'Billie Jean',a:'Michael Jackson',y:1982,g:'pop'},
+  {id:'029',t:'Thriller',a:'Michael Jackson',y:1982,g:'pop'},
+  {id:'030',t:'Like a Prayer',a:'Madonna',y:1989,g:'pop'},
+  {id:'031',t:"Sweet Child O' Mine",a:"Guns N' Roses",y:1987,g:'rock'},
+  {id:'032',t:'Jump',a:'Van Halen',y:1984,g:'rock'},
+  {id:'033',t:'Every Breath You Take',a:'The Police',y:1983,g:'pop'},
+  {id:'034',t:'Take On Me',a:'a-ha',y:1985,g:'synth-pop'},
+  {id:'035',t:"Don't You (Forget About Me)",a:'Simple Minds',y:1985,g:'new wave'},
+  {id:'036',t:'Girls Just Want to Have Fun',a:'Cyndi Lauper',y:1983,g:'pop'},
+  {id:'037',t:'Africa',a:'Toto',y:1982,g:'pop'},
+  {id:'038',t:'With or Without You',a:'U2',y:1987,g:'rock'},
+  {id:'039',t:'Born in the USA',a:'Bruce Springsteen',y:1984,g:'rock'},
+  {id:'040',t:'Purple Rain',a:'Prince',y:1984,g:'pop'},
+  {id:'041',t:'Total Eclipse of the Heart',a:'Bonnie Tyler',y:1983,g:'pop'},
+  {id:'042',t:"Wake Me Up Before You Go-Go",a:'Wham!',y:1984,g:'pop'},
+  {id:'043',t:"Livin' on a Prayer",a:'Bon Jovi',y:1986,g:'rock'},
+  {id:'044',t:'Call Me',a:'Blondie',y:1980,g:'new wave'},
+  {id:'045',t:'Tainted Love',a:'Soft Cell',y:1981,g:'synth-pop'},
+  {id:'046',t:"Don't Stop Believin'",a:'Journey',y:1981,g:'rock'},
+  {id:'047',t:'Eye of the Tiger',a:'Survivor',y:1982,g:'rock'},
+  {id:'048',t:'Rio',a:'Duran Duran',y:1982,g:'new wave'},
+  {id:'049',t:'Smalltown Boy',a:'Bronski Beat',y:1984,g:'synth-pop'},
+  {id:'050',t:'Evidências',a:'Chitãozinho & Xororó',y:1989,g:'sertanejo'},
+  {id:'051',t:'Fio de Cabelo',a:'Chitãozinho & Xororó',y:1982,g:'sertanejo'},
+  {id:'052',t:'Toda Forma de Amor',a:'Lulu Santos',y:1988,g:'pop'},
+  {id:'053',t:'Como é Grande o Meu Amor',a:'Roberto Carlos',y:1980,g:'pop'},
+  {id:'054',t:'Mad World',a:'Tears for Fears',y:1982,g:'new wave'},
+  {id:'055',t:'Take My Breath Away',a:'Berlin',y:1986,g:'synth-pop'},
+  {id:'056',t:"Don't You Want Me",a:'The Human League',y:1981,g:'synth-pop'},
+  {id:'057',t:"What's Love Got to Do With It",a:'Tina Turner',y:1984,g:'pop'},
+  {id:'058',t:'Like a Virgin',a:'Madonna',y:1984,g:'pop'},
+  {id:'059',t:'Running Up That Hill',a:'Kate Bush',y:1985,g:'synth-pop'},
+  {id:'060',t:'Beat It',a:'Michael Jackson',y:1982,g:'pop'},
+  {id:'061',t:'Smells Like Teen Spirit',a:'Nirvana',y:1991,g:'grunge'},
+  {id:'062',t:'Losing My Religion',a:'R.E.M.',y:1991,g:'rock'},
+  {id:'063',t:'Wonderwall',a:'Oasis',y:1995,g:'britpop'},
+  {id:'064',t:'...Baby One More Time',a:'Britney Spears',y:1998,g:'pop'},
+  {id:'065',t:'No Scrubs',a:'TLC',y:1999,g:'r&b'},
+  {id:'066',t:'I Will Always Love You',a:'Whitney Houston',y:1992,g:'pop'},
+  {id:'067',t:'Killing Me Softly',a:'Fugees',y:1996,g:'hip-hop'},
+  {id:'068',t:'Un-Break My Heart',a:'Toni Braxton',y:1996,g:'r&b'},
+  {id:'069',t:'Waterfalls',a:'TLC',y:1994,g:'r&b'},
+  {id:'070',t:'Creep',a:'Radiohead',y:1992,g:'alternative'},
+  {id:'071',t:'One',a:'U2',y:1991,g:'rock'},
+  {id:'072',t:'Black Hole Sun',a:'Soundgarden',y:1994,g:'grunge'},
+  {id:'073',t:'Zombie',a:'The Cranberries',y:1994,g:'rock'},
+  {id:'074',t:'Ironic',a:'Alanis Morissette',y:1996,g:'rock'},
+  {id:'075',t:'My Heart Will Go On',a:'Celine Dion',y:1997,g:'pop'},
+  {id:'076',t:'Wannabe',a:'Spice Girls',y:1996,g:'pop'},
+  {id:'077',t:'Blue (Da Ba Dee)',a:'Eiffel 65',y:1998,g:'eurodance'},
+  {id:'078',t:'Mambo No. 5',a:'Lou Bega',y:1999,g:'pop'},
+  {id:'079',t:'Macarena',a:'Los Del Rio',y:1995,g:'pop'},
+  {id:'080',t:"Gangsta's Paradise",a:'Coolio',y:1995,g:'hip-hop'},
+  {id:'081',t:'Sozinho',a:'Caetano Veloso',y:1998,g:'mpb'},
+  {id:'082',t:'É o Amor',a:'Zezé di Camargo & Luciano',y:1991,g:'sertanejo'},
+  {id:'083',t:'Tocando em Frente',a:'Almir Sater',y:1990,g:'mpb'},
+  {id:'084',t:'Aquele Beijo',a:'Frank Aguiar',y:1994,g:'forró'},
+  {id:'085',t:'Shape of My Heart',a:'Sting',y:1993,g:'pop'},
+  {id:'086',t:'Dreams',a:'The Cranberries',y:1993,g:'rock'},
+  {id:'087',t:'Karma Police',a:'Radiohead',y:1997,g:'alternative'},
+  {id:'088',t:'Common People',a:'Pulp',y:1995,g:'britpop'},
+  {id:'089',t:"You Oughta Know",a:'Alanis Morissette',y:1995,g:'rock'},
+  {id:'090',t:'Vogue',a:'Madonna',y:1990,g:'pop'},
+  {id:'091',t:'Crazy in Love',a:'Beyoncé',y:2003,g:'r&b'},
+  {id:'092',t:'Beautiful Day',a:'U2',y:2000,g:'rock'},
+  {id:'093',t:'Numb',a:'Linkin Park',y:2003,g:'nu-metal'},
+  {id:'094',t:'In the End',a:'Linkin Park',y:2000,g:'nu-metal'},
+  {id:'095',t:'Complicated',a:'Avril Lavigne',y:2002,g:'pop-punk'},
+  {id:'096',t:'Boulevard of Broken Dreams',a:'Green Day',y:2004,g:'punk rock'},
+  {id:'097',t:'Since U Been Gone',a:'Kelly Clarkson',y:2004,g:'pop rock'},
+  {id:'098',t:'Yeah!',a:'Usher',y:2004,g:'r&b'},
+  {id:'099',t:"Hips Don't Lie",a:'Shakira',y:2006,g:'pop'},
+  {id:'100',t:'Umbrella',a:'Rihanna',y:2007,g:'pop'},
+  {id:'101',t:'SexyBack',a:'Justin Timberlake',y:2006,g:'pop'},
+  {id:'102',t:'Poker Face',a:'Lady Gaga',y:2008,g:'pop'},
+  {id:'103',t:'Viva la Vida',a:'Coldplay',y:2008,g:'rock'},
+  {id:'104',t:'Rehab',a:'Amy Winehouse',y:2006,g:'soul'},
+  {id:'105',t:'Stronger',a:'Kanye West',y:2007,g:'hip-hop'},
+  {id:'106',t:'Mr. Brightside',a:'The Killers',y:2003,g:'indie rock'},
+  {id:'107',t:'Seven Nation Army',a:'The White Stripes',y:2003,g:'rock'},
+  {id:'108',t:'Clocks',a:'Coldplay',y:2002,g:'alternative'},
+  {id:'109',t:'In Da Club',a:'50 Cent',y:2003,g:'hip-hop'},
+  {id:'110',t:'Crazy',a:'Gnarls Barkley',y:2006,g:'soul'},
+  {id:'111',t:'Gold Digger',a:'Kanye West',y:2005,g:'hip-hop'},
+  {id:'112',t:'Beautiful',a:'Christina Aguilera',y:2002,g:'pop'},
+  {id:'113',t:'Hey There Delilah',a:"Plain White T's",y:2005,g:'indie pop'},
+  {id:'114',t:'Apologize',a:'Timbaland ft. OneRepublic',y:2007,g:'pop'},
+  {id:'115',t:"Drop It Like It's Hot",a:'Snoop Dogg',y:2004,g:'hip-hop'},
+  {id:'116',t:'Rolling in the Deep',a:'Adele',y:2010,g:'pop'},
+  {id:'117',t:'Meu Bem Querer',a:'Ivete Sangalo',y:1999,g:'axé'},
+  {id:'118',t:'Borboletas',a:'Victor & Leo',y:2005,g:'sertanejo'},
+  {id:'119',t:'Coração de Cowboy',a:'Luan Santana',y:2009,g:'sertanejo'},
+  {id:'120',t:'Ray of Light',a:'Madonna',y:1998,g:'pop'},
+  {id:'121',t:'Blinding Lights',a:'The Weeknd',y:2019,g:'synth-pop'},
+  {id:'122',t:'Shape of You',a:'Ed Sheeran',y:2017,g:'pop'},
+  {id:'123',t:'Uptown Funk',a:'Mark Ronson ft. Bruno Mars',y:2014,g:'funk'},
+  {id:'124',t:'Happy',a:'Pharrell Williams',y:2013,g:'pop'},
+  {id:'125',t:'Despacito',a:'Luis Fonsi',y:2017,g:'reggaeton'},
+  {id:'126',t:'Someone Like You',a:'Adele',y:2011,g:'pop'},
+  {id:'127',t:'Stay With Me',a:'Sam Smith',y:2014,g:'soul'},
+  {id:'128',t:'Thinking Out Loud',a:'Ed Sheeran',y:2014,g:'pop'},
+  {id:'129',t:'Sorry',a:'Justin Bieber',y:2015,g:'pop'},
+  {id:'130',t:'Call Me Maybe',a:'Carly Rae Jepsen',y:2011,g:'pop'},
+  {id:'131',t:'Royals',a:'Lorde',y:2013,g:'indie pop'},
+  {id:'132',t:'Pumped Up Kicks',a:'Foster the People',y:2010,g:'indie pop'},
+  {id:'133',t:'Gangnam Style',a:'PSY',y:2012,g:'k-pop'},
+  {id:'134',t:'Thrift Shop',a:'Macklemore',y:2012,g:'hip-hop'},
+  {id:'135',t:'Chandelier',a:'Sia',y:2014,g:'pop'},
+  {id:'136',t:'Roar',a:'Katy Perry',y:2013,g:'pop'},
+  {id:'137',t:'Dark Horse',a:'Katy Perry',y:2013,g:'pop'},
+  {id:'138',t:'Shake It Off',a:'Taylor Swift',y:2014,g:'pop'},
+  {id:'139',t:'Blank Space',a:'Taylor Swift',y:2014,g:'pop'},
+  {id:'140',t:'Work',a:'Rihanna',y:2016,g:'reggae'},
+  {id:'141',t:'One Dance',a:'Drake',y:2016,g:'afrobeats'},
+  {id:'142',t:'Hotline Bling',a:'Drake',y:2015,g:'hip-hop'},
+  {id:'143',t:"God's Plan",a:'Drake',y:2018,g:'hip-hop'},
+  {id:'144',t:'Sicko Mode',a:'Travis Scott',y:2018,g:'hip-hop'},
+  {id:'145',t:'Old Town Road',a:'Lil Nas X',y:2018,g:'country trap'},
+  {id:'146',t:'Sunflower',a:'Post Malone & Swae Lee',y:2018,g:'pop'},
+  {id:'147',t:'Rockstar',a:'Post Malone',y:2017,g:'hip-hop'},
+  {id:'148',t:'Perfect',a:'Ed Sheeran',y:2017,g:'pop'},
+  {id:'149',t:'Havana',a:'Camila Cabello',y:2017,g:'pop'},
+  {id:'150',t:'Shallow',a:'Lady Gaga & Bradley Cooper',y:2018,g:'pop'},
+  {id:'151',t:'Closer',a:'The Chainsmokers',y:2016,g:'pop'},
+  {id:'152',t:'High Hopes',a:'Panic! at the Disco',y:2018,g:'pop rock'},
+  {id:'153',t:'Thunder',a:'Imagine Dragons',y:2017,g:'pop rock'},
+  {id:'154',t:'Believer',a:'Imagine Dragons',y:2017,g:'pop rock'},
+  {id:'155',t:'Radioactive',a:'Imagine Dragons',y:2012,g:'pop rock'},
+  {id:'156',t:'Stressed Out',a:'Twenty One Pilots',y:2015,g:'indie pop'},
+  {id:'157',t:'Feel It Still',a:'Portugal. The Man',y:2017,g:'indie pop'},
+  {id:'158',t:'Party Rock Anthem',a:'LMFAO',y:2011,g:'electronic'},
+  {id:'159',t:'We Are Young',a:'fun.',y:2011,g:'indie pop'},
+  {id:'160',t:'Somebody That I Used to Know',a:'Gotye',y:2011,g:'indie pop'},
+  {id:'161',t:'We Found Love',a:'Rihanna',y:2011,g:'electronic'},
+  {id:'162',t:'Levels',a:'Avicii',y:2011,g:'electronic'},
+  {id:'163',t:'Wake Me Up',a:'Avicii',y:2013,g:'electronic'},
+  {id:'164',t:'Animals',a:'Martin Garrix',y:2013,g:'electronic'},
+  {id:'165',t:'Titanium',a:'David Guetta',y:2011,g:'electronic'},
+  {id:'166',t:'Vai Malandra',a:'Anitta',y:2017,g:'funk'},
+  {id:'167',t:'Show das Poderosas',a:'Anitta',y:2013,g:'funk'},
+  {id:'168',t:'Ai Se Eu Te Pego',a:'Michel Teló',y:2011,g:'forró'},
+  {id:'169',t:'Largado às Traças',a:'Zé Neto & Cristiano',y:2018,g:'sertanejo'},
+  {id:'170',t:'Amor Perfeito',a:'Jorge & Mateus',y:2010,g:'sertanejo'},
+  {id:'171',t:'Cruel Summer',a:'Taylor Swift',y:2019,g:'pop'},
+  {id:'172',t:'Señorita',a:'Shawn Mendes & Camila Cabello',y:2019,g:'pop'},
+  {id:'173',t:"Don't Start Now",a:'Dua Lipa',y:2019,g:'pop'},
+  {id:'174',t:'New Rules',a:'Dua Lipa',y:2017,g:'pop'},
+  {id:'175',t:'Counting Stars',a:'OneRepublic',y:2013,g:'pop rock'},
+  {id:'176',t:'Let Her Go',a:'Passenger',y:2012,g:'folk pop'},
+  {id:'177',t:'A Thousand Years',a:'Christina Perri',y:2011,g:'pop'},
+  {id:'178',t:'Ho Hey',a:'The Lumineers',y:2012,g:'folk pop'},
+  {id:'179',t:'Demons',a:'Imagine Dragons',y:2012,g:'pop rock'},
+  {id:'180',t:'Locked Out of Heaven',a:'Bruno Mars',y:2012,g:'pop rock'},
+  {id:'181',t:'Levitating',a:'Dua Lipa',y:2020,g:'pop'},
+  {id:'182',t:"Driver's License",a:'Olivia Rodrigo',y:2021,g:'pop'},
+  {id:'183',t:'Good 4 U',a:'Olivia Rodrigo',y:2021,g:'pop punk'},
+  {id:'184',t:'Industry Baby',a:'Lil Nas X',y:2021,g:'hip-hop'},
+  {id:'185',t:'Peaches',a:'Justin Bieber',y:2021,g:'r&b'},
+  {id:'186',t:'Stay',a:'The Kid Laroi & Justin Bieber',y:2021,g:'pop'},
+  {id:'187',t:'Easy On Me',a:'Adele',y:2021,g:'pop'},
+  {id:'188',t:'Anti-Hero',a:'Taylor Swift',y:2022,g:'pop'},
+  {id:'189',t:'As It Was',a:'Harry Styles',y:2022,g:'pop'},
+  {id:'190',t:'Heat Waves',a:'Glass Animals',y:2020,g:'indie pop'},
+  {id:'191',t:'Unholy',a:'Sam Smith & Kim Petras',y:2022,g:'pop'},
+  {id:'192',t:'Flowers',a:'Miley Cyrus',y:2023,g:'pop'},
+  {id:'193',t:'Physical',a:'Dua Lipa',y:2020,g:'pop'},
+  {id:'194',t:'Save Your Tears',a:'The Weeknd',y:2020,g:'synth-pop'},
+  {id:'195',t:'Watermelon Sugar',a:'Harry Styles',y:2019,g:'pop'},
+  {id:'196',t:'Dynamite',a:'BTS',y:2020,g:'k-pop'},
+  {id:'197',t:'Butter',a:'BTS',y:2021,g:'k-pop'},
+  {id:'198',t:'Shivers',a:'Ed Sheeran',y:2021,g:'pop'},
+  {id:'199',t:'Cold Heart',a:'Elton John & Dua Lipa',y:2021,g:'pop'},
+  {id:'200',t:'Montero',a:'Lil Nas X',y:2021,g:'pop'},
+  {id:'201',t:'Mood',a:'24kGoldn',y:2020,g:'hip-hop'},
+  {id:'202',t:'Envolver',a:'Anitta',y:2021,g:'reggaeton'},
+  {id:'203',t:'Forro do Elétrico',a:'Barões da Pisadinha',y:2020,g:'forró'},
+  {id:'204',t:'Traição',a:'Marília Mendonça',y:2019,g:'sertanejo'},
+  {id:'205',t:'Ghost',a:'Justin Bieber',y:2021,g:'pop'},
+  {id:'206',t:'About Damn Time',a:'Lizzo',y:2022,g:'pop'},
+  {id:'207',t:'Golden Hour',a:'JVKE',y:2022,g:'pop'},
+  {id:'208',t:'Kill Bill',a:'SZA',y:2022,g:'r&b'},
+  {id:'209',t:'Glimpse of Us',a:'Joji',y:2022,g:'r&b'},
+  {id:'210',t:'Grenade',a:'Bruno Mars',y:2010,g:'pop'},
+  {id:'211',t:'Just the Way You Are',a:'Bruno Mars',y:2010,g:'pop'},
+  {id:'212',t:'Treasure',a:'Bruno Mars',y:2012,g:'pop'},
+  {id:'213',t:'24K Magic',a:'Bruno Mars',y:2016,g:'funk'},
+  {id:'214',t:"That's What I Like",a:'Bruno Mars',y:2016,g:'funk'},
+  {id:'215',t:'Finesse',a:'Bruno Mars',y:2016,g:'funk'},
+  {id:'216',t:'Stitches',a:'Shawn Mendes',y:2015,g:'pop'},
+  {id:'217',t:'Treat You Better',a:'Shawn Mendes',y:2016,g:'pop'},
+  {id:'218',t:'IDGAF',a:'Dua Lipa',y:2018,g:'pop'},
+  {id:'219',t:'Break My Heart',a:'Dua Lipa',y:2020,g:'pop'},
+  {id:'220',t:'SAD!',a:'XXXTENTACION',y:2018,g:'hip-hop'},
+  {id:'221',t:'Elastic Heart',a:'Sia',y:2015,g:'pop'},
+  {id:'222',t:'Team',a:'Lorde',y:2013,g:'indie pop'},
+  {id:'223',t:'Say Something',a:'A Great Big World',y:2013,g:'pop'},
+  {id:'224',t:'Ho Hey',a:'The Lumineers',y:2012,g:'folk pop'},
+  {id:'225',t:"It's Time",a:'Imagine Dragons',y:2012,g:'pop rock'},
+  {id:'226',t:'Natural',a:'Imagine Dragons',y:2018,g:'pop rock'},
+  {id:'227',t:'Enemy',a:'Imagine Dragons',y:2021,g:'pop rock'},
+  {id:'228',t:'Bones',a:'Imagine Dragons',y:2022,g:'pop rock'},
+  {id:'229',t:'Hung Up',a:'Madonna',y:2005,g:'pop'},
+  {id:'230',t:"Papa Don't Preach",a:'Madonna',y:1986,g:'pop'},
+  {id:'231',t:'Quando a Chuva Passar',a:'Djavan',y:1982,g:'mpb'},
+  {id:'232',t:'Você é Linda',a:'Caetano Veloso',y:1994,g:'mpb'},
+  {id:'233',t:'Recairei',a:'Gusttavo Lima',y:2020,g:'sertanejo'},
+  {id:'234',t:'Permission to Dance',a:'BTS',y:2021,g:'k-pop'},
+  {id:'235',t:'Something Just Like This',a:'Chainsmokers & Coldplay',y:2017,g:'pop'},
+  {id:'236',t:"Can't Stop the Feeling!",a:'Justin Timberlake',y:2016,g:'pop'},
+  {id:'237',t:'Love Yourself',a:'Justin Bieber',y:2015,g:'pop'},
+  {id:'238',t:'Cheap Thrills',a:'Sia',y:2016,g:'pop'},
+  {id:'239',t:'Lean On',a:'Major Lazer',y:2015,g:'electronic'},
+  {id:'240',t:'Attention',a:'Charlie Puth',y:2017,g:'pop'},
+  {id:'241',t:'Man in the Mirror',a:'Michael Jackson',y:1987,g:'pop'},
+  {id:'242',t:'Black or White',a:'Michael Jackson',y:1991,g:'pop'},
+  {id:'243',t:'Quando Você Passar',a:'Djavan',y:1982,g:'mpb'},
+  {id:'244',t:'Vamos Fugir',a:'Gilberto Gil',y:1984,g:'mpb'},
+  {id:'245',t:'Anunciação',a:'Alceu Valença',y:1982,g:'mpb'},
+  {id:'246',t:'La Isla Bonita',a:'Madonna',y:1987,g:'pop'},
+  {id:'247',t:'Material Girl',a:'Madonna',y:1984,g:'pop'},
+  {id:'248',t:'Papa Don't Preach',a:'Madonna',y:1986,g:'pop'},
+  {id:'249',t:'Escapism',a:'RAYE',y:2022,g:'r&b'},
+  {id:'250',t:'About Damn Time',a:'Lizzo',y:2022,g:'pop'},
+];
+
+const GC={
+  'rock':'#EF4444','pop':'#8B5CF6','hip-hop':'#F59E0B','r&b':'#EC4899',
+  'electronic':'#06B6D4','soul':'#F97316','funk':'#84CC16','mpb':'#14B8A6',
+  'sertanejo':'#A78BFA','forró':'#FB923C','axé':'#FBBF24',
+  'bossa nova':'#34D399','samba':'#4ADE80','grunge':'#94A3B8',
+  'indie pop':'#C084FC','k-pop':'#F472B6','reggaeton':'#4ADE80',
+  'synth-pop':'#38BDF8','new wave':'#A3E635','disco':'#FCD34D',
+  'punk rock':'#F87171','nu-metal':'#94A3B8','alternative':'#7DD3FC',
+  'britpop':'#6EE7B7','eurodance':'#FDE68A','folk pop':'#BBF7D0',
+  'afrobeats':'#86EFAC','country trap':'#FEF08A','pop rock':'#60A5FA',
+  'reggae':'#4ADE80','indie rock':'#F87171','pop-punk':'#FB7185','pop punk':'#FB7185',
+};
+function gc(g){if(!g)return'#8B5CF6';const k=g.toLowerCase();for(const[key,val]of Object.entries(GC)){if(k.includes(key))return val;}return'#8B5CF6';}
+
+const PGRADS=[['#7C3AED','#5548F0'],['#0891B2','#0E7490'],['#059669','#047857'],['#DC2626','#991B1B']];
+
+const S={pc:2,pnames:['Jogador 1','Jogador 2','Jogador 3','Jogador 4'],players:[],idx:0,deck:[],card:null,pos:null,phase:'setup',correct:null};
+
+renderNames();
+
+function setPC(n){
+  S.pc=n;
+  document.querySelectorAll('.cnt-btn').forEach((b,i)=>b.classList.toggle('on',i+1===n));
+  renderNames();
+}
+
+function renderNames(){
+  const g=document.getElementById('names-grid');g.innerHTML='';
+  for(let i=0;i<S.pc;i++){
+    const[c1,c2]=PGRADS[i];
+    const init=(S.pnames[i]||'')[0]?.toUpperCase()||String(i+1);
+    g.innerHTML+=`<div class="name-row">
+      <div class="name-av" style="background:linear-gradient(135deg,${c1},${c2})" id="nav-${i}">${init}</div>
+      <input class="name-inp" id="ni-${i}" value="${esc(S.pnames[i]||'')}" placeholder="Jogador ${i+1}" maxlength="16"
+        oninput="S.pnames[${i}]=this.value;document.getElementById('nav-${i}').textContent=(this.value||'${i+1}')[0].toUpperCase()">
+    </div>`;
+  }
+}
+
+function startGame(){
+  for(let i=0;i<S.pc;i++){const inp=document.getElementById('ni-'+i);S.pnames[i]=(inp?.value.trim()||'Jogador '+(i+1));}
+  const deck=shuffle([...DB]);
+  S.players=[];
+  for(let i=0;i<S.pc;i++){
+    const seed=deck.splice(0,1)[0];
+    const[ca,cb]=PGRADS[i];
+    S.players.push({name:S.pnames[i],tl:[{s:seed}],score:1,ca,cb});
+  }
+  S.deck=deck;S.idx=0;S.card=S.deck.shift();S.pos=null;S.phase='playing';S.correct=null;
+  showScreen('game');renderGame();
+}
+
+function renderGame(){
+  const p=S.players[S.idx];
+  document.getElementById('deck-ct').textContent=S.deck.length+' cartas';
+  document.getElementById('turn-badge').textContent='Vez de '+p.name;
+  renderPBar();renderMainCard(S.card);
+  document.getElementById('main-card').classList.remove('flipped');
+  document.getElementById('main-card').style.pointerEvents='';
+  S.pos=null;renderTL();updateConf();renderOthers();
+  document.querySelector('.gbody').scrollTop=0;
+}
+
+function renderPBar(){
+  const bar=document.getElementById('pbar');bar.innerHTML='';
+  S.players.forEach((p,i)=>{
+    const on=i===S.idx;
+    bar.innerHTML+=`<div class="ptab ${on?'on':''}">
+      <div class="ptab-av" style="background:linear-gradient(135deg,${p.ca},${p.cb})">${p.name[0].toUpperCase()}</div>
+      <div class="ptab-name">${esc(p.name)}</div>
+      <div class="ptab-sc">${p.score}/10</div>
+      <div class="ptab-bar"></div>
+    </div>`;
+  });
+}
+
+function renderMainCard(song){
+  if(!song)return;
+  const col=gc(song.g);
+  document.getElementById('cg-dot').style.cssText=`background:${col};box-shadow:0 0 5px ${col}99`;
+  document.getElementById('cg-lbl').textContent=(song.g||'music').toUpperCase();
+  document.getElementById('cg-lbl').style.color=col;
+  document.getElementById('cg-stripe').style.background=col+'18';
+  document.getElementById('ctitle').textContent=song.t;
+  document.getElementById('cartist').textContent=song.a;
+  document.getElementById('flip-hint').textContent='posicione primeiro ↓';
+  document.getElementById('cprompt').textContent='Escolha uma posição na linha do tempo ↓';
+  document.getElementById('cprompt').className='card-prompt';
+  document.getElementById('cback').style.cssText=`background:linear-gradient(145deg,${col}55,${col}22,${col}11);border:1px solid ${col}44;transform:rotateY(180deg)`;
+  document.getElementById('cback-yr').textContent=song.y;
+  document.getElementById('cback-dec').textContent=decade(song.y);
+  document.getElementById('cback-title').textContent=song.t;
+  document.getElementById('cverdict').textContent='';
+}
+
+function renderTL(){
+  const p=S.players[S.idx];const tl=p.tl;const ia=S.phase==='playing';
+  document.getElementById('tl-count').textContent=tl.length+' carta'+(tl.length!==1?'s':'');
+  document.getElementById('tl-hint').style.display=ia?'block':'none';
+  const tr=document.getElementById('tl-track');tr.innerHTML='';
+  tr.appendChild(makeIZ(0,ia));
+  tl.forEach((entry,i)=>{tr.appendChild(makeTLC(entry));tr.appendChild(makeIZ(i+1,ia));});
+}
+
+function makeTLC(e){
+  const col=gc(e.s.g);const d=document.createElement('div');d.className='tlc';
+  d.innerHTML=`<div class="tlc-in" style="background:linear-gradient(145deg,${col}33,${col}16)">
+    <div class="tlc-yr" style="color:${col}">${e.s.y}</div>
+    <div class="tlc-sep" style="background:${col}55"></div>
+    <div class="tlc-title">${esc(e.s.t)}</div>
+  </div>`;return d;
+}
+
+function makeIZ(idx,active){
+  const d=document.createElement('div');
+  d.className='iz'+(S.pos===idx?' sel':'');d.dataset.i=idx;
+  d.innerHTML='<div class="iz-dot"></div><div class="iz-arrow">↓</div>';
+  if(active)d.addEventListener('click',()=>selPos(idx));
+  return d;
+}
+
+function renderOthers(){
+  const sec=document.getElementById('others');
+  if(S.players.length<=1){sec.innerHTML='';return;}
+  sec.innerHTML='<div class="eyebrow" style="margin-bottom:8px">Outros Jogadores</div>';
+  S.players.forEach((p,i)=>{
+    if(i===S.idx)return;
+    const wrap=document.createElement('div');wrap.className='ocard';
+    wrap.innerHTML=`<div class="ocard-head"><span class="ocard-name">${esc(p.name)}</span><span class="ocard-score">${p.score}/10</span></div>`;
+    const scroll=document.createElement('div');scroll.className='tl-scroll';scroll.style.padding='4px 0 8px';
+    const tr=document.createElement('div');tr.className='tl-track';
+    p.tl.forEach(entry=>{
+      const col=gc(entry.s.g);const c=document.createElement('div');
+      c.className='tlc';c.style.height='110px';
+      c.innerHTML=`<div class="tlc-in" style="background:linear-gradient(145deg,${col}33,${col}16);height:110px">
+        <div class="tlc-yr" style="color:${col};font-size:20px">${entry.s.y}</div>
+        <div class="tlc-sep" style="background:${col}55"></div>
+        <div class="tlc-title">${esc(entry.s.t)}</div>
+      </div>`;
+      tr.appendChild(c);
+    });
+    scroll.appendChild(tr);wrap.appendChild(scroll);sec.appendChild(wrap);
+  });
+}
+
+function selPos(idx){
+  if(S.phase!=='playing')return;
+  S.pos=idx;
+  document.querySelectorAll('.iz').forEach(z=>z.classList.toggle('sel',parseInt(z.dataset.i)===idx));
+  document.getElementById('flip-hint').textContent='↑ clique na carta para revelar';
+  document.getElementById('cprompt').textContent='Posição '+(idx+1)+' selecionada — clique na carta ou no botão';
+  document.getElementById('cprompt').className='card-prompt act';
+  updateConf();
+}
+
+function updateConf(){
+  const btn=document.getElementById('conf-btn');
+  if(S.pos!==null){btn.disabled=false;btn.textContent='✓  Revelar na Posição '+(S.pos+1);}
+  else{btn.disabled=true;btn.textContent='Selecione uma posição primeiro';}
+}
+
+function onCardClick(){
+  if(S.phase!=='playing')return;
+  if(S.pos===null){showToast('Escolha um espaço na linha do tempo primeiro ↓');return;}
+  flipCard();
+}
+
+function flipCard(){
+  if(S.pos===null||S.phase!=='playing')return;
+  const p=S.players[S.idx];const song=S.card;
+  const chosen=S.pos;const correct=corrIdx(song,p.tl);const ok=chosen===correct;
+  document.getElementById('cback').style.background=ok?'linear-gradient(145deg,#059669,#047857)':'linear-gradient(145deg,#DC2626,#991B1B)';
+  document.getElementById('cback').style.border='1px solid '+(ok?'#10B98155':'#EF444455');
+  document.getElementById('cback').style.transform='rotateY(180deg)';
+  document.getElementById('cverdict').textContent=ok?'✓':'✕';
+  const wrap=document.getElementById('main-card');
+  wrap.style.pointerEvents='none';document.getElementById('conf-btn').disabled=true;
+  wrap.classList.add('flipped');
+  setTimeout(()=>{
+    S.phase='revealing';S.correct=ok;
+    if(ok){p.tl=sortTL([...p.tl,{s:song}]);p.score++;}
+    showReveal(song,ok,chosen,correct,p.score);
+  },620);
+}
+
+function showReveal(song,ok,chosen,correct,score){
+  const badge=document.getElementById('rev-badge');
+  const inner=document.getElementById('rev-inner');
+  const note=document.getElementById('rev-note');
+  const scrow=document.getElementById('rev-scrow');
+  badge.className='rev-badge '+(ok?'ok':'er');
+  badge.innerHTML=(ok?'🎉 &nbsp;Correto!':'😬 &nbsp;Errado!');
+  inner.className='rev-inner '+(ok?'ok':'er');
+  document.getElementById('rev-yr').textContent=song.y;
+  document.getElementById('rev-stitle').textContent=song.t;
+  document.getElementById('rev-artist').textContent=song.a;
+  note.className=ok?'rev-note hidden':'rev-note';
+  if(!ok)note.textContent='Você escolheu posição '+(chosen+1)+', correto era posição '+(correct+1);
+  scrow.className=ok?'rev-scrow':'rev-scrow hidden';
+  if(ok)document.getElementById('rev-scval').textContent=score+'/10';
+  document.getElementById('rev-ov').classList.add('show');
+}
+
+function closeReveal(){
+  document.getElementById('rev-ov').classList.remove('show');
+  const p=S.players[S.idx];
+  if(p.score>=10){S.phase='won';showWin();return;}
+  S.idx=(S.idx+1)%S.players.length;
+  S.card=S.deck.shift()||null;S.pos=null;S.phase='playing';
+  if(!S.card){S.phase='won';showWin();return;}
+  renderGame();
+}
+
+function quitGame(){if(confirm('Sair da partida atual?')){S.phase='setup';showScreen('setup');}}
+
+function showWin(){
+  const sorted=[...S.players].sort((a,b)=>b.score-a.score);
+  const winner=sorted[0];
+  document.getElementById('win-sub').innerHTML='<span class="win-name">'+esc(winner.name)+'</span> venceu com '+winner.score+' ponto'+(winner.score!==1?'s':'')+'!';
+  const medals=['🥇','🥈','🥉','4º'];
+  const ri=s=>s>=10?{l:'CAMPEÃO',c:'#F59E0B'}:s>=7?{l:'EXPERT',c:'#8B5CF6'}:s>=5?{l:'CRAQUE',c:'#10B981'}:{l:'NOVATO',c:'#60A5FA'};
+  const sb=document.getElementById('sboard');sb.innerHTML='';
+  sorted.forEach((p,rank)=>{
+    const isW=rank===0;const r=ri(p.score);
+    sb.innerHTML+=`<div class="srow ${isW?'wr':''}">
+      <div class="srow-med">${medals[rank]||''}</div>
+      <div class="srow-av" style="background:linear-gradient(135deg,${p.ca},${p.cb})">${p.name[0].toUpperCase()}</div>
+      <div class="srow-info">
+        <div class="srow-name">${esc(p.name)}</div>
+        <div class="srow-rank" style="color:${r.c};border-color:${r.c}55">${r.l}</div>
+      </div>
+      <div><span class="srow-num">${p.score}</span><span class="srow-den">/10</span></div>
+    </div>`;
+  });
+  const wtl=document.getElementById('win-tls');wtl.innerHTML='';
+  sorted.forEach(p=>{
+    const chips=p.tl.map(e=>{const col=gc(e.s.g);return`<div class="win-chip" style="color:${col};border-color:${col}44">${e.s.y}</div>`;}).join('');
+    wtl.innerHTML+=`<div class="win-tl-row" style="margin-bottom:12px"><div class="win-tl-name">${esc(p.name)}</div><div class="win-tl-chips">${chips}</div></div>`;
+  });
+  showScreen('win');
+}
+
+function restartGame(){
+  const deck=shuffle([...DB]);
+  S.players.forEach(p=>{const seed=deck.splice(0,1)[0];p.tl=[{s:seed}];p.score=1;});
+  S.deck=deck;S.idx=0;S.card=S.deck.shift();S.pos=null;S.phase='playing';S.correct=null;
+  showScreen('game');renderGame();
+}
+
+function goSetup(){S.phase='setup';showScreen('setup');renderNames();}
+
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=0|Math.random()*(i+1);[a[i],a[j]]=[a[j],a[i]];}return a;}
+function corrIdx(song,tl){let i=0;for(const c of tl){if(song.y>c.s.y)i++;else break;}return i;}
+function sortTL(tl){return[...tl].sort((a,b)=>a.s.y-b.s.y);}
+function decade(y){return(Math.floor(y/10)*10)+'s';}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('active');s.scrollTop=0;});document.getElementById('screen-'+id).classList.add('active');}
+let toastT;
+function showToast(msg,dur=2800){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove('show'),dur);}
+
+</script>
+</body>
+</html>
