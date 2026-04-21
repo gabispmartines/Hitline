@@ -109,8 +109,8 @@ body::before{
 .cartist{font-size:10px;font-weight:500;color:rgba(255,255,255,.48);letter-spacing:.06em;text-transform:uppercase;position:relative;z-index:1;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .cfront-foot{padding:9px 13px;border-top:1px solid rgba(255,255,255,.05);text-align:center}
 .flip-hint{font-size:8.5px;letter-spacing:1.4px;text-transform:uppercase;color:rgba(255,255,255,.22)}
-.cback{transform:rotateY(180deg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;box-shadow:0 8px 32px rgba(0,0,0,.55);padding:16px}
-.cback-year{font-family:var(--fh);font-size:48px;font-weight:800;letter-spacing:-1px;line-height:1.1;color:#fff;text-align:center;white-space:nowrap}
+.cback{transform:rotateY(180deg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;box-shadow:0 8px 32px rgba(0,0,0,.55)}
+.cback-year{font-family:var(--fh);font-size:56px;font-weight:800;letter-spacing:-.05em;line-height:1;color:#fff;text-align:center}
 .cback-decade{font-size:8px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.42);margin-top:5px;margin-bottom:13px}
 .cback-sep{width:32px;height:2px;border-radius:1px;background:rgba(255,255,255,.28);margin-bottom:13px}
 .cback-title{font-family:var(--fh);font-size:12px;font-weight:700;color:rgba(255,255,255,.88);text-align:center;padding:0 12px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
@@ -204,29 +204,19 @@ body::before{
 .toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(60px);background:var(--bg3);border:1px solid var(--b1);border-radius:var(--rf);padding:10px 22px;font-size:13px;font-weight:500;color:var(--t0);box-shadow:0 8px 30px rgba(0,0,0,.45);z-index:500;transition:transform .3s cubic-bezier(.175,.885,.32,1.275),opacity .3s;pointer-events:none;white-space:nowrap;opacity:0}
 .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
 
-/* Spotify tap press animation */
-.card-wrap.pressing {
-  animation: cardPress 0.18s cubic-bezier(.36,.07,.19,.97) both;
-}
+/* Spotify press animation */
 @keyframes cardPress {
   0%   { transform: scale(1); }
   40%  { transform: scale(0.93); }
   100% { transform: scale(1); }
 }
-/* Spotify badge on card footer */
-.spotify-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 8px;
-  font-weight: 700;
-  letter-spacing: .12em;
-  color: rgba(255,255,255,.32);
-  text-transform: uppercase;
-}
-.spotify-badge svg {
-  flex-shrink: 0;
-}
+/* cback year fix */
+.cback-year { font-size: 48px !important; letter-spacing: -1px !important; line-height: 1.1 !important; white-space: nowrap !important; }
+.cface.cback { padding: 16px !important; }
+
+select.name-inp { color: var(--t0); background-color: var(--bg2); }
+select.name-inp option { background: var(--bg2); color: var(--t0); }
+.ptab { min-width: 58px !important; }
 </style>
 </head>
 <body>
@@ -240,11 +230,18 @@ body::before{
   </div>
   <div class="surface">
     <div class="eyebrow">Número de Jogadores</div>
-    <div class="count-row">
-      <button class="cnt-btn" onclick="setPC(1)">1</button>
-      <button class="cnt-btn on" onclick="setPC(2)">2</button>
-      <button class="cnt-btn" onclick="setPC(3)">3</button>
-      <button class="cnt-btn" onclick="setPC(4)">4</button>
+    <div style="margin-top:10px">
+      <select id="player-count-select" class="name-inp" style="width:100%;font-family:var(--fh);font-size:18px;font-weight:700;padding:12px 14px;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%228%22 viewBox=%220 0 12 8%22><path d=%22M1 1l5 5 5-5%22 stroke=%22%23A0A0CC%22 stroke-width=%221.8%22 fill=%22none%22 stroke-linecap=%22round%22/></svg>');background-repeat:no-repeat;background-position:right 14px center" onchange="setPC(parseInt(this.value))">
+        <option value="2" selected>2 jogadores</option>
+        <option value="3">3 jogadores</option>
+        <option value="4">4 jogadores</option>
+        <option value="5">5 jogadores</option>
+        <option value="6">6 jogadores</option>
+        <option value="7">7 jogadores</option>
+        <option value="8">8 jogadores</option>
+        <option value="9">9 jogadores</option>
+        <option value="10">10 jogadores</option>
+      </select>
     </div>
     <div class="divider" style="margin:16px 0"></div>
     <div class="eyebrow">Nomes dos Jogadores</div>
@@ -259,7 +256,7 @@ body::before{
     </div>
   </div>
   <button class="btn btn-p" onclick="startGame()">▶  Começar Jogo</button>
-  <div class="setup-foot">250 músicas · Brasileiras + Internacionais · Anos 40–2020s</div>
+  <div class="setup-foot">308 músicas · Anos 1930–2024 · 2–10 jogadores</div>
 </div>
 
 <div id="screen-game" class="screen">
@@ -285,14 +282,12 @@ body::before{
               <div class="cartist" id="cartist">—</div>
             </div>
             <div class="cfront-foot">
-            <div class="flip-hint" id="flip-hint">toque para ouvir 🎧</div>
-            <div class="spotify-badge" id="spotify-badge" style="display:none">
-              <svg width="10" height="10" viewBox="0 0 168 168" fill="#1DB954">
-                <path d="M83.996 0C37.747 0 0 37.7 0 83.996c0 46.3 37.747 84 83.996 84 46.254 0 84.004-37.7 84.004-84C168 37.698 130.25 0 84 0zM122.4 121.2c-1.6 2.6-5 3.4-7.6 1.8-20.8-12.7-47-15.6-77.8-8.5-3 .7-5.9-1.1-6.6-4-.7-3 1.1-5.9 4-6.6 33.7-7.7 62.6-4.4 86 9.7 2.6 1.6 3.4 5 1.8 7.6zM133.2 98.1c-2 3.2-6.2 4.3-9.5 2.3-23.8-14.6-60.2-18.8-88.4-10.3-3.7 1.1-7.5-1-8.6-4.6-1.1-3.7 1-7.5 4.6-8.6 32.2-9.7 72.2-5 99.5 11.7 3.3 2 4.3 6.2 2.4 9.5zM134 74.1c-28.5-17-75.5-18.5-102.7-10.3-4.4 1.3-9-1.2-10.3-5.6-1.3-4.4 1.2-9 5.6-10.3C57 38.3 109 40 141.4 59.2c3.9 2.3 5.2 7.4 2.9 11.3-2.3 3.9-7.4 5.2-11.3 2.9z"/>
-              </svg>
-              Abrir no Spotify
+              <div class="flip-hint" id="flip-hint">toque para ouvir 🎧</div>
+              <div id="spotify-badge" style="display:none;align-items:center;gap:5px;font-size:8px;font-weight:700;letter-spacing:.1em;color:rgba(255,255,255,.5);text-transform:uppercase;margin-top:4px">
+                <svg width="10" height="10" viewBox="0 0 168 168" fill="#1DB954"><path d="M83.996.277C37.747.277 0 37.9 0 84.152c0 46.248 37.747 83.86 83.996 83.86 46.254 0 84.004-37.612 84.004-83.86C168.001 37.9 130.25.277 84 .277zM122.4 121.057c-1.6 2.598-5 3.408-7.601 1.816-20.8-12.71-47-15.585-77.8-8.54-2.97.677-5.939-1.108-6.614-4.077-.677-2.968 1.108-5.936 4.077-6.614 33.707-7.706 62.607-4.39 86.018 9.71 2.6 1.594 3.408 5 1.82 7.705zm10.83-24.065c-2.002 3.248-6.254 4.27-9.502 2.268-23.808-14.63-60.094-18.875-88.22-10.328-3.648 1.106-7.5-1.006-8.608-4.651-1.105-3.648 1.007-7.496 4.654-8.603 32.2-9.773 72.2-5.036 99.51 11.768 3.248 1.995 4.27 6.25 2.166 9.546zm.93-25.058c-28.5-16.93-75.54-18.48-102.77-10.23-4.37 1.325-8.98-1.14-10.306-5.51-1.325-4.37 1.14-8.98 5.51-10.306 31.23-9.48 83.13-7.646 115.92 11.832 3.93 2.33 5.22 7.382 2.892 11.31-2.33 3.924-7.384 5.22-11.245 2.905z"/></svg>
+                Abrir no Spotify
+              </div>
             </div>
-          </div>
           </div>
           <div class="cface cback" id="cback">
             <div class="cback-year" id="cback-yr">—</div>
@@ -375,7 +370,316 @@ body::before{
 ═══════════════════════════════════════════════════════ */
 
 // Song database injected below
-var DB = [{"id": "001", "t": "Aquarela do Brasil", "a": "Ary Barroso", "y": 1939, "g": "samba", "spotify": "https://open.spotify.com/track/2FRnf9qhLbvw8fu4IBXx78"}, {"id": "002", "t": "Asa Branca", "a": "Luiz Gonzaga", "y": 1947, "g": "forró", "spotify": "https://open.spotify.com/track/5PbLBMO8gGzCxCiGBWtY6T"}, {"id": "003", "t": "Garota de Ipanema", "a": "Tom Jobim", "y": 1962, "g": "bossa nova", "spotify": "https://open.spotify.com/track/5UqC9HQTMN2YUBkRgPAUNb"}, {"id": "004", "t": "Travessia", "a": "Milton Nascimento", "y": 1967, "g": "mpb", "spotify": "https://open.spotify.com/track/1vZpjGRFYqvN7k41BKHF5r"}, {"id": "005", "t": "Hey Jude", "a": "The Beatles", "y": 1968, "g": "rock", "spotify": "https://open.spotify.com/track/0aym2LBJBk9DAYuHHutrIl"}, {"id": "006", "t": "Respect", "a": "Aretha Franklin", "y": 1967, "g": "soul", "spotify": "https://open.spotify.com/track/7s25THrKz86DM225dkTHNP"}, {"id": "007", "t": "Good Vibrations", "a": "The Beach Boys", "y": 1966, "g": "pop", "spotify": "https://open.spotify.com/track/3YtOMRV8XNpLSEFwtkoeAV"}, {"id": "008", "t": "Like a Rolling Stone", "a": "Bob Dylan", "y": 1965, "g": "rock", "spotify": "https://open.spotify.com/track/3AhXZa8sUQht0UEdBJgpGc"}, {"id": "009", "t": "Gimme Shelter", "a": "The Rolling Stones", "y": 1969, "g": "rock", "spotify": "https://open.spotify.com/track/6vQN2a9QSgWcm74KEZYfDL"}, {"id": "010", "t": "A Whiter Shade of Pale", "a": "Procol Harum", "y": 1967, "g": "rock", "spotify": "https://open.spotify.com/track/3LZLG0xFhkzGNpB7FCi81I"}, {"id": "011", "t": "Bohemian Rhapsody", "a": "Queen", "y": 1975, "g": "rock", "spotify": "https://open.spotify.com/track/4u7EnebtmKWzUH433cf5Qv"}, {"id": "012", "t": "Hotel California", "a": "Eagles", "y": 1977, "g": "rock", "spotify": "https://open.spotify.com/track/40riOy7x9W7GXjyGp4pjAv"}, {"id": "013", "t": "Stairway to Heaven", "a": "Led Zeppelin", "y": 1971, "g": "rock", "spotify": "https://open.spotify.com/track/5CQ30WqJwcep0pYcV4AMNc"}, {"id": "014", "t": "Superstition", "a": "Stevie Wonder", "y": 1972, "g": "funk", "spotify": "https://open.spotify.com/track/1h6QZOC4LZBACKTYKPV7wh"}, {"id": "015", "t": "Stayin' Alive", "a": "Bee Gees", "y": 1977, "g": "disco", "spotify": "https://open.spotify.com/track/3qT4bUD1MaWpGrTwcvguhb"}, {"id": "016", "t": "I Will Survive", "a": "Gloria Gaynor", "y": 1978, "g": "disco", "spotify": "https://open.spotify.com/track/6nQ7nMFMnQhQ5VUjAnHHBI"}, {"id": "017", "t": "Dancing Queen", "a": "ABBA", "y": 1976, "g": "pop", "spotify": "https://open.spotify.com/track/0GjEhVFGZW8afUYGChu3Rr"}, {"id": "018", "t": "Roxanne", "a": "The Police", "y": 1978, "g": "rock", "spotify": "https://open.spotify.com/track/3HWzoJ7f7k8IFLeoXFIjDF"}, {"id": "019", "t": "Le Freak", "a": "Chic", "y": 1978, "g": "disco", "spotify": "https://open.spotify.com/track/7BHjl3HCuFDMSxvgMaILEJ"}, {"id": "020", "t": "Waterloo", "a": "ABBA", "y": 1974, "g": "pop", "spotify": "https://open.spotify.com/track/0LcHpIVG5LdOLcSuBNHdUN"}, {"id": "021", "t": "Como Nossos Pais", "a": "Elis Regina", "y": 1976, "g": "mpb", "spotify": "https://open.spotify.com/track/67Hna13YJkgwJOzgEzLsJI"}, {"id": "022", "t": "Dreams", "a": "Fleetwood Mac", "y": 1977, "g": "rock", "spotify": "https://open.spotify.com/track/1PSUtmxWCZQlBGzMKmwvJc"}, {"id": "023", "t": "September", "a": "Earth Wind & Fire", "y": 1978, "g": "funk", "spotify": "https://open.spotify.com/track/2grjqo0ZwSQya4K63toMoO"}, {"id": "024", "t": "O Bêbado e a Equilibrista", "a": "Elis Regina", "y": 1979, "g": "mpb", "spotify": "https://open.spotify.com/track/6xyFSXtlkMCLJbFEQr7mhA"}, {"id": "025", "t": "Killing Me Softly", "a": "Roberta Flack", "y": 1973, "g": "soul", "spotify": "https://open.spotify.com/track/1DHGKvhBmxHDjW8GoqXBnw"}, {"id": "026", "t": "Let's Stay Together", "a": "Al Green", "y": 1971, "g": "soul", "spotify": "https://open.spotify.com/track/3HZaTSLhDzHHQsEBuG8JpA"}, {"id": "027", "t": "Flor de Lis", "a": "Djavan", "y": 1976, "g": "mpb", "spotify": "https://open.spotify.com/track/4yDgRKFHjuyCqbv0HLxKPF"}, {"id": "028", "t": "Billie Jean", "a": "Michael Jackson", "y": 1982, "g": "pop", "spotify": "https://open.spotify.com/track/5ChkMS8OtdzJeqyybCc9R5"}, {"id": "029", "t": "Thriller", "a": "Michael Jackson", "y": 1982, "g": "pop", "spotify": "https://open.spotify.com/track/2LlQR7U0x83kZgaANTJp6E"}, {"id": "030", "t": "Like a Prayer", "a": "Madonna", "y": 1989, "g": "pop", "spotify": "https://open.spotify.com/track/1z3ugFmUKoCzGsI6jdcyFq"}, {"id": "031", "t": "Sweet Child O' Mine", "a": "Guns N' Roses", "y": 1987, "g": "rock", "spotify": "https://open.spotify.com/track/7snQQk1zcKl8gZ92AnueZW"}, {"id": "032", "t": "Jump", "a": "Van Halen", "y": 1984, "g": "rock", "spotify": "https://open.spotify.com/track/2dBa1bN3bHW4H9IAPQ3gBz"}, {"id": "033", "t": "Every Breath You Take", "a": "The Police", "y": 1983, "g": "pop", "spotify": "https://open.spotify.com/track/1JSTJqkT5qHq8MDJnJbRE1"}, {"id": "034", "t": "Take On Me", "a": "a-ha", "y": 1985, "g": "synth-pop", "spotify": "https://open.spotify.com/track/2WfaOiMkCvy7F5fcp2zZ8L"}, {"id": "035", "t": "Don't You (Forget About Me)", "a": "Simple Minds", "y": 1985, "g": "new wave", "spotify": "https://open.spotify.com/track/5FTSlDiRqPLSBaBeRl7IDS"}, {"id": "036", "t": "Girls Just Want to Have Fun", "a": "Cyndi Lauper", "y": 1983, "g": "pop", "spotify": "https://open.spotify.com/track/5ByAIlEEnxYdvpnezg7HTX"}, {"id": "037", "t": "Africa", "a": "Toto", "y": 1982, "g": "pop", "spotify": "https://open.spotify.com/track/2374M0fQpWi3dLnB54qaLX"}, {"id": "038", "t": "With or Without You", "a": "U2", "y": 1987, "g": "rock", "spotify": "https://open.spotify.com/track/2PEHSvJlQT6LPWNlj7XJ0W"}, {"id": "039", "t": "Born in the USA", "a": "Bruce Springsteen", "y": 1984, "g": "rock", "spotify": "https://open.spotify.com/track/1t0zp4mFMmQbpWJiLAVMF1"}, {"id": "040", "t": "Purple Rain", "a": "Prince", "y": 1984, "g": "pop", "spotify": "https://open.spotify.com/track/54X78diSloVnfJNHQXBDzL"}, {"id": "041", "t": "Total Eclipse of the Heart", "a": "Bonnie Tyler", "y": 1983, "g": "pop", "spotify": "https://open.spotify.com/track/4LRPiXqCikLlN15c3yImP7"}, {"id": "042", "t": "Wake Me Up Before You Go-Go", "a": "Wham!", "y": 1984, "g": "pop", "spotify": "https://open.spotify.com/track/6tNQ70jh4wnmOAIFge1MRb"}, {"id": "043", "t": "Livin' on a Prayer", "a": "Bon Jovi", "y": 1986, "g": "rock", "spotify": "https://open.spotify.com/track/37Tmv4NnfQeb0S5E3rYNNh"}, {"id": "044", "t": "Call Me", "a": "Blondie", "y": 1980, "g": "new wave", "spotify": "https://open.spotify.com/track/4xBCMD9xIBnxJBCGT6xkDt"}, {"id": "045", "t": "Tainted Love", "a": "Soft Cell", "y": 1981, "g": "synth-pop", "spotify": "https://open.spotify.com/track/5EK5PFqI3IfWAHN3BRSZW8"}, {"id": "046", "t": "Don't Stop Believin'", "a": "Journey", "y": 1981, "g": "rock", "spotify": "https://open.spotify.com/track/4bHsxqR3GMrXTxEPLuK5ue"}, {"id": "047", "t": "Eye of the Tiger", "a": "Survivor", "y": 1982, "g": "rock", "spotify": "https://open.spotify.com/track/2HHtWyy5CgaQbC7XSoOb0e"}, {"id": "048", "t": "Rio", "a": "Duran Duran", "y": 1982, "g": "new wave", "spotify": "https://open.spotify.com/track/5G2f63n7IPV7k2yFnDVNPE"}, {"id": "049", "t": "Smalltown Boy", "a": "Bronski Beat", "y": 1984, "g": "synth-pop", "spotify": "https://open.spotify.com/track/2EuAKSgJVJAcS6Pk7l3yRJ"}, {"id": "050", "t": "Evidências", "a": "Chitãozinho & Xororó", "y": 1989, "g": "sertanejo", "spotify": "https://open.spotify.com/track/7sOR7gk6XykXwbfEBXMSJh"}, {"id": "051", "t": "Fio de Cabelo", "a": "Chitãozinho & Xororó", "y": 1982, "g": "sertanejo", "spotify": "https://open.spotify.com/track/3t4v6GjOJgQCKhzJTmR0TY"}, {"id": "052", "t": "Toda Forma de Amor", "a": "Lulu Santos", "y": 1988, "g": "pop", "spotify": "https://open.spotify.com/track/6KqMXIpHGLIVY3VBR8t7Hw"}, {"id": "053", "t": "Como é Grande o Meu Amor", "a": "Roberto Carlos", "y": 1980, "g": "pop", "spotify": "https://open.spotify.com/track/2wFKXpPBq1BGNL23zBl3rX"}, {"id": "054", "t": "Mad World", "a": "Tears for Fears", "y": 1982, "g": "new wave", "spotify": "https://open.spotify.com/track/3JOVTQ5h8HyvI8m8327yd4"}, {"id": "055", "t": "Take My Breath Away", "a": "Berlin", "y": 1986, "g": "synth-pop", "spotify": "https://open.spotify.com/track/2xnF2iMRYNFSBmJFLiNsP5"}, {"id": "056", "t": "Don't You Want Me", "a": "The Human League", "y": 1981, "g": "synth-pop", "spotify": "https://open.spotify.com/track/5CtI0ECR4TaFVTAVtdGGBM"}, {"id": "057", "t": "What's Love Got to Do With It", "a": "Tina Turner", "y": 1984, "g": "pop", "spotify": "https://open.spotify.com/track/6RHTUrRF63xao58xh9FKUC"}, {"id": "058", "t": "Like a Virgin", "a": "Madonna", "y": 1984, "g": "pop", "spotify": "https://open.spotify.com/track/0E9ZzoBTHFoFMOXXAXZS0s"}, {"id": "059", "t": "Running Up That Hill", "a": "Kate Bush", "y": 1985, "g": "synth-pop", "spotify": "https://open.spotify.com/track/75FEaRjZTKLhTrFGsfMUXR"}, {"id": "060", "t": "Beat It", "a": "Michael Jackson", "y": 1982, "g": "pop", "spotify": "https://open.spotify.com/track/3BovdzfaX4jbTMsHatVSBf"}, {"id": "061", "t": "Smells Like Teen Spirit", "a": "Nirvana", "y": 1991, "g": "grunge", "spotify": "https://open.spotify.com/track/5ghIJDpPoe3CfHMGu71E6T"}, {"id": "062", "t": "Losing My Religion", "a": "R.E.M.", "y": 1991, "g": "rock", "spotify": "https://open.spotify.com/track/4MUMDy5UaV0hCHzH6OQIPB"}, {"id": "063", "t": "Wonderwall", "a": "Oasis", "y": 1995, "g": "britpop", "spotify": "https://open.spotify.com/track/7sO5G9EABYOXQKNPNiE9NR"}, {"id": "064", "t": "...Baby One More Time", "a": "Britney Spears", "y": 1998, "g": "pop", "spotify": "https://open.spotify.com/track/3MjUtNVVq3C8Fn0MP3zhXa"}, {"id": "065", "t": "No Scrubs", "a": "TLC", "y": 1999, "g": "r&b", "spotify": "https://open.spotify.com/track/3DYVZoaIxMmFMhCCpDmOtD"}, {"id": "066", "t": "I Will Always Love You", "a": "Whitney Houston", "y": 1992, "g": "pop", "spotify": "https://open.spotify.com/track/4eHbdreAnSOrDDsFfc4Fpm"}, {"id": "067", "t": "Killing Me Softly", "a": "Fugees", "y": 1996, "g": "hip-hop", "spotify": "https://open.spotify.com/track/3lmSMjqnTyHMzSc7IbpUlI"}, {"id": "068", "t": "Un-Break My Heart", "a": "Toni Braxton", "y": 1996, "g": "r&b", "spotify": "https://open.spotify.com/track/7cCt1lGOOFEnGPLLgGq3gy"}, {"id": "069", "t": "Waterfalls", "a": "TLC", "y": 1994, "g": "r&b", "spotify": "https://open.spotify.com/track/0z9DAnvFNzqJnRBMvJQWlB"}, {"id": "070", "t": "Creep", "a": "Radiohead", "y": 1992, "g": "alternative", "spotify": "https://open.spotify.com/track/70LcF31zb1H0PyJoS1Sx1j"}, {"id": "071", "t": "One", "a": "U2", "y": 1991, "g": "rock", "spotify": "https://open.spotify.com/track/54lgEVQSNaHPxSniXqtQ6j"}, {"id": "072", "t": "Black Hole Sun", "a": "Soundgarden", "y": 1994, "g": "grunge", "spotify": "https://open.spotify.com/track/3lquKGPlZ7jfXyZp5JYuSC"}, {"id": "073", "t": "Zombie", "a": "The Cranberries", "y": 1994, "g": "rock", "spotify": "https://open.spotify.com/track/6Ejrz78d7HNh5bUkSH3VHm"}, {"id": "074", "t": "Ironic", "a": "Alanis Morissette", "y": 1996, "g": "rock", "spotify": "https://open.spotify.com/track/1ATLjnCdKnIFHZqaM5c7ov"}, {"id": "075", "t": "My Heart Will Go On", "a": "Celine Dion", "y": 1997, "g": "pop", "spotify": "https://open.spotify.com/track/3PxHNDSygZLcJyMB7PNQPE"}, {"id": "076", "t": "Wannabe", "a": "Spice Girls", "y": 1996, "g": "pop", "spotify": "https://open.spotify.com/track/1Je1IMUlBXfWa2EMMylr5w"}, {"id": "077", "t": "Blue (Da Ba Dee)", "a": "Eiffel 65", "y": 1998, "g": "eurodance", "spotify": "https://open.spotify.com/track/5Gc4P3KBVuUUCmCVABsmXn"}, {"id": "078", "t": "Mambo No. 5", "a": "Lou Bega", "y": 1999, "g": "pop", "spotify": "https://open.spotify.com/track/0GvKIKBepZcmWZpM7s5Nuh"}, {"id": "079", "t": "Macarena", "a": "Los Del Rio", "y": 1995, "g": "pop", "spotify": "https://open.spotify.com/track/5AnVMDODEUeqnpZPFR9BKi"}, {"id": "080", "t": "Gangsta's Paradise", "a": "Coolio", "y": 1995, "g": "hip-hop", "spotify": "https://open.spotify.com/track/1YSgX9X5f6aVQi7U5L6jHp"}, {"id": "081", "t": "Sozinho", "a": "Caetano Veloso", "y": 1998, "g": "mpb", "spotify": "https://open.spotify.com/track/5OIZX0sIjIwzfQFsLiJdDd"}, {"id": "082", "t": "É o Amor", "a": "Zezé di Camargo & Luciano", "y": 1991, "g": "sertanejo", "spotify": "https://open.spotify.com/track/6uRMBK17bJLGjmb9aTHqVX"}, {"id": "083", "t": "Tocando em Frente", "a": "Almir Sater", "y": 1990, "g": "mpb", "spotify": "https://open.spotify.com/track/0UKwnPiIJVTbKoO3I7HOXS"}, {"id": "084", "t": "Aquele Beijo", "a": "Frank Aguiar", "y": 1994, "g": "forró", "spotify": "https://open.spotify.com/track/3pODCEJHeaGvXmidnLBJCJ"}, {"id": "085", "t": "Shape of My Heart", "a": "Sting", "y": 1993, "g": "pop", "spotify": "https://open.spotify.com/track/3MRCIJeiFb2BySpkBNbQyJ"}, {"id": "086", "t": "Dreams", "a": "The Cranberries", "y": 1993, "g": "rock", "spotify": "https://open.spotify.com/track/6oqMGK5BSxIeHmFqZpMDxp"}, {"id": "087", "t": "Karma Police", "a": "Radiohead", "y": 1997, "g": "alternative", "spotify": "https://open.spotify.com/track/6f32XSGpJJcFXK2TbLXuVo"}, {"id": "088", "t": "Common People", "a": "Pulp", "y": 1995, "g": "britpop", "spotify": "https://open.spotify.com/track/7KzIHBU2Ip6RFzQUVMkBpZ"}, {"id": "089", "t": "You Oughta Know", "a": "Alanis Morissette", "y": 1995, "g": "rock", "spotify": "https://open.spotify.com/track/3CdMlfu7kQQCxPAHqSXLEb"}, {"id": "090", "t": "Vogue", "a": "Madonna", "y": 1990, "g": "pop", "spotify": "https://open.spotify.com/track/6FMFIbMOyJK1F6fhHmkEj9"}, {"id": "091", "t": "Crazy in Love", "a": "Beyoncé", "y": 2003, "g": "r&b", "spotify": "https://open.spotify.com/track/5IVuqXILoxVWvWEPm82Jxr"}, {"id": "092", "t": "Beautiful Day", "a": "U2", "y": 2000, "g": "rock", "spotify": "https://open.spotify.com/track/4kl9F7HCiICJQjGMpT4ReK"}, {"id": "093", "t": "Numb", "a": "Linkin Park", "y": 2003, "g": "nu-metal", "spotify": "https://open.spotify.com/track/1LLmJhqYFhLSjEbXMqMZQv"}, {"id": "094", "t": "In the End", "a": "Linkin Park", "y": 2000, "g": "nu-metal", "spotify": "https://open.spotify.com/track/60a0Rd6pjrkxjPbaKzXjfq"}, {"id": "095", "t": "Complicated", "a": "Avril Lavigne", "y": 2002, "g": "pop-punk", "spotify": "https://open.spotify.com/track/2iUmqdfGZcHIItqJDnOoGj"}, {"id": "096", "t": "Boulevard of Broken Dreams", "a": "Green Day", "y": 2004, "g": "punk rock", "spotify": "https://open.spotify.com/track/4R2kfaDFgnFqaMRqwDTrEa"}, {"id": "097", "t": "Since U Been Gone", "a": "Kelly Clarkson", "y": 2004, "g": "pop rock", "spotify": "https://open.spotify.com/track/4WLRXhb7YnHJsIHKE7L6KH"}, {"id": "098", "t": "Yeah!", "a": "Usher", "y": 2004, "g": "r&b", "spotify": "https://open.spotify.com/track/5OHVnCHmwqvNTHDHdAeEu0"}, {"id": "099", "t": "Hips Don't Lie", "a": "Shakira", "y": 2006, "g": "pop", "spotify": "https://open.spotify.com/track/4Lj8paMFwyKTGfILLELVxt"}, {"id": "100", "t": "Umbrella", "a": "Rihanna", "y": 2007, "g": "pop", "spotify": "https://open.spotify.com/track/7cn3sTwGpRxDo0BzFJhSdG"}, {"id": "101", "t": "SexyBack", "a": "Justin Timberlake", "y": 2006, "g": "pop", "spotify": "https://open.spotify.com/track/1AWQoqb9bSvzTjaLralEkT"}, {"id": "102", "t": "Poker Face", "a": "Lady Gaga", "y": 2008, "g": "pop", "spotify": "https://open.spotify.com/track/7MXVkk9YMctZqd1Srtv4MB"}, {"id": "103", "t": "Viva la Vida", "a": "Coldplay", "y": 2008, "g": "rock", "spotify": "https://open.spotify.com/track/1mea3bSkSGXuIRvnydlB5b"}, {"id": "104", "t": "Rehab", "a": "Amy Winehouse", "y": 2006, "g": "soul", "spotify": "https://open.spotify.com/track/2ctvdKmETyYznF9Y7uASwv"}, {"id": "105", "t": "Stronger", "a": "Kanye West", "y": 2007, "g": "hip-hop", "spotify": "https://open.spotify.com/track/7e89621JPkKaeDSTQ3vlna"}, {"id": "106", "t": "Mr. Brightside", "a": "The Killers", "y": 2003, "g": "indie rock", "spotify": "https://open.spotify.com/track/0RiRZpuVRbi7oqGIHBu9Vf"}, {"id": "107", "t": "Seven Nation Army", "a": "The White Stripes", "y": 2003, "g": "rock", "spotify": "https://open.spotify.com/track/7lLy6akgOVBzCuYi0gJEHB"}, {"id": "108", "t": "Clocks", "a": "Coldplay", "y": 2002, "g": "alternative", "spotify": "https://open.spotify.com/track/0BCPKOYdS2jbQ8SnNWwHBQ"}, {"id": "109", "t": "In Da Club", "a": "50 Cent", "y": 2003, "g": "hip-hop", "spotify": "https://open.spotify.com/track/4LaRYkEP0UvBpKXlMMlI8L"}, {"id": "110", "t": "Crazy", "a": "Gnarls Barkley", "y": 2006, "g": "soul", "spotify": "https://open.spotify.com/track/2BIr9tgfmMlWpxN7jbv2K1"}, {"id": "111", "t": "Gold Digger", "a": "Kanye West", "y": 2005, "g": "hip-hop", "spotify": "https://open.spotify.com/track/4ScCswdRlyA23odg9thgIO"}, {"id": "112", "t": "Beautiful", "a": "Christina Aguilera", "y": 2002, "g": "pop", "spotify": "https://open.spotify.com/track/4neIVgnnMVtFCOCbBpzpbG"}, {"id": "113", "t": "Hey There Delilah", "a": "Plain White Ts", "y": 2005, "g": "indie pop", "spotify": "https://open.spotify.com/track/4DO5gW0PGlMbFJkJnMg7LD"}, {"id": "114", "t": "Apologize", "a": "Timbaland ft OneRepublic", "y": 2007, "g": "pop", "spotify": "https://open.spotify.com/track/0to73PgYyYlOXLWF99cGCs"}, {"id": "115", "t": "Drop It Like Its Hot", "a": "Snoop Dogg", "y": 2004, "g": "hip-hop", "spotify": "https://open.spotify.com/track/6pjBBerurEV9BhDLPHMd7K"}, {"id": "116", "t": "Rolling in the Deep", "a": "Adele", "y": 2010, "g": "pop", "spotify": "https://open.spotify.com/track/4sPmO7WMQUAf45kwMOtONw"}, {"id": "117", "t": "Meu Bem Querer", "a": "Ivete Sangalo", "y": 1999, "g": "axé", "spotify": "https://open.spotify.com/track/6QFGqLpnJQbCBp4L3Ofrxy"}, {"id": "118", "t": "Borboletas", "a": "Victor & Leo", "y": 2005, "g": "sertanejo", "spotify": "https://open.spotify.com/track/3cj95MqYxOJSHJJRSUNmTQ"}, {"id": "119", "t": "Coração de Cowboy", "a": "Luan Santana", "y": 2009, "g": "sertanejo", "spotify": "https://open.spotify.com/track/5FNUTUFVNzA1nRCkSB0Bgf"}, {"id": "120", "t": "Ray of Light", "a": "Madonna", "y": 1998, "g": "pop", "spotify": "https://open.spotify.com/track/5eSzRnxPMBTRvJ4K3ZHlmR"}, {"id": "121", "t": "Blinding Lights", "a": "The Weeknd", "y": 2019, "g": "synth-pop", "spotify": "https://open.spotify.com/track/0VjIjW4GlUZAMYd2vXMi3b"}, {"id": "122", "t": "Shape of You", "a": "Ed Sheeran", "y": 2017, "g": "pop", "spotify": "https://open.spotify.com/track/7qiZfU4dY1lWllzX7mPBI3"}, {"id": "123", "t": "Uptown Funk", "a": "Mark Ronson ft Bruno Mars", "y": 2014, "g": "funk", "spotify": "https://open.spotify.com/track/32OlwWms8aLsShumksBKNf"}, {"id": "124", "t": "Happy", "a": "Pharrell Williams", "y": 2013, "g": "pop", "spotify": "https://open.spotify.com/track/60nZcImufyMA1MKQY3dcCH"}, {"id": "125", "t": "Despacito", "a": "Luis Fonsi", "y": 2017, "g": "reggaeton", "spotify": "https://open.spotify.com/track/6habFhsOp2NvyLhErLngvU"}, {"id": "126", "t": "Someone Like You", "a": "Adele", "y": 2011, "g": "pop", "spotify": "https://open.spotify.com/track/1zwMYTA5nlNjZxYrvBB2pV"}, {"id": "127", "t": "Stay With Me", "a": "Sam Smith", "y": 2014, "g": "soul", "spotify": "https://open.spotify.com/track/5QO79kh1waicV47BqGRL3g"}, {"id": "128", "t": "Thinking Out Loud", "a": "Ed Sheeran", "y": 2014, "g": "pop", "spotify": "https://open.spotify.com/track/34gCuhDGsG4bRPIf9bb02f"}, {"id": "129", "t": "Sorry", "a": "Justin Bieber", "y": 2015, "g": "pop", "spotify": "https://open.spotify.com/track/69bp2EbF7Q2rqc5N3ylezZ"}, {"id": "130", "t": "Call Me Maybe", "a": "Carly Rae Jepsen", "y": 2011, "g": "pop", "spotify": "https://open.spotify.com/track/20OFwXhEXf12DzwXmI1koR"}, {"id": "131", "t": "Royals", "a": "Lorde", "y": 2013, "g": "indie pop", "spotify": "https://open.spotify.com/track/5dTHtzHFPyi8TlTtzoz1J9"}, {"id": "132", "t": "Pumped Up Kicks", "a": "Foster the People", "y": 2010, "g": "indie pop", "spotify": "https://open.spotify.com/track/7wGoVu4Dady5GV0Sv4UIsx"}, {"id": "133", "t": "Gangnam Style", "a": "PSY", "y": 2012, "g": "k-pop", "spotify": "https://open.spotify.com/track/03UrZgTINDqvnUMbbIMixJ"}, {"id": "134", "t": "Thrift Shop", "a": "Macklemore", "y": 2012, "g": "hip-hop", "spotify": "https://open.spotify.com/track/2cGxRwrMyEAp8dEbyUg5Yi"}, {"id": "135", "t": "Chandelier", "a": "Sia", "y": 2014, "g": "pop", "spotify": "https://open.spotify.com/track/4ddSv3yXGC68FXMwmm2Y5P"}, {"id": "136", "t": "Roar", "a": "Katy Perry", "y": 2013, "g": "pop", "spotify": "https://open.spotify.com/track/4jbmgIyjGoXjY01XxatOx6"}, {"id": "137", "t": "Dark Horse", "a": "Katy Perry", "y": 2013, "g": "pop", "spotify": "https://open.spotify.com/track/6DAYEJU1bsHRteGqIhaNQT"}, {"id": "138", "t": "Shake It Off", "a": "Taylor Swift", "y": 2014, "g": "pop", "spotify": "https://open.spotify.com/track/5XeFesFbtLpXzIVDNQP22n"}, {"id": "139", "t": "Blank Space", "a": "Taylor Swift", "y": 2014, "g": "pop", "spotify": "https://open.spotify.com/track/1p80LdxRV74UKvL8gnD7ne"}, {"id": "140", "t": "Work", "a": "Rihanna", "y": 2016, "g": "reggae", "spotify": "https://open.spotify.com/track/6oqNVigiqf0QJsCAHOWb3O"}, {"id": "141", "t": "One Dance", "a": "Drake", "y": 2016, "g": "afrobeats", "spotify": "https://open.spotify.com/track/1zi7xx7UVEFkmKAv9iOrqY"}, {"id": "142", "t": "Hotline Bling", "a": "Drake", "y": 2015, "g": "hip-hop", "spotify": "https://open.spotify.com/track/0wwPcA6wtMf6HUMpIRdeP7"}, {"id": "143", "t": "God's Plan", "a": "Drake", "y": 2018, "g": "hip-hop", "spotify": "https://open.spotify.com/track/1BVIF9GSSiGBBEVFKSyc4J"}, {"id": "144", "t": "Sicko Mode", "a": "Travis Scott", "y": 2018, "g": "hip-hop", "spotify": "https://open.spotify.com/track/2xLMifQCjDGFmkHkpNLD9h"}, {"id": "145", "t": "Old Town Road", "a": "Lil Nas X", "y": 2018, "g": "country trap", "spotify": "https://open.spotify.com/track/2YpeDb67231RjR0MgVLzsG"}, {"id": "146", "t": "Sunflower", "a": "Post Malone & Swae Lee", "y": 2018, "g": "pop", "spotify": "https://open.spotify.com/track/3ee8Jmje8o58CHK66QrVC2"}, {"id": "147", "t": "Rockstar", "a": "Post Malone", "y": 2017, "g": "hip-hop", "spotify": "https://open.spotify.com/track/4f9Mzze0RPQZL3GiMuBBzQ"}, {"id": "148", "t": "Perfect", "a": "Ed Sheeran", "y": 2017, "g": "pop", "spotify": "https://open.spotify.com/track/0tgVpDi06FyKpA1z0VMD4v"}, {"id": "149", "t": "Havana", "a": "Camila Cabello", "y": 2017, "g": "pop", "spotify": "https://open.spotify.com/track/4bJBiZNQkTBn3kVHtCm7X3"}, {"id": "150", "t": "Shallow", "a": "Lady Gaga & Bradley Cooper", "y": 2018, "g": "pop", "spotify": "https://open.spotify.com/track/2VxeLyX666F8uXCJ0dZF8B"}, {"id": "151", "t": "Closer", "a": "The Chainsmokers", "y": 2016, "g": "pop", "spotify": "https://open.spotify.com/track/7BKLCZ1jbUBVqRi2FVlTVw"}, {"id": "152", "t": "High Hopes", "a": "Panic at the Disco", "y": 2018, "g": "pop rock", "spotify": "https://open.spotify.com/track/6KImwSHMjoCzrMFVuLkIXz"}, {"id": "153", "t": "Thunder", "a": "Imagine Dragons", "y": 2017, "g": "pop rock", "spotify": "https://open.spotify.com/track/5VnDkUm0laf8MHJODiU77f"}, {"id": "154", "t": "Believer", "a": "Imagine Dragons", "y": 2017, "g": "pop rock", "spotify": "https://open.spotify.com/track/0CcQNd8CINkwQfe1RDtGV6"}, {"id": "155", "t": "Radioactive", "a": "Imagine Dragons", "y": 2012, "g": "pop rock", "spotify": "https://open.spotify.com/track/4NHQUkpP4jnFRkxQlG06d2"}, {"id": "156", "t": "Stressed Out", "a": "Twenty One Pilots", "y": 2015, "g": "indie pop", "spotify": "https://open.spotify.com/track/3CRDbSIZ4r5MsZ0YwxuEkn"}, {"id": "157", "t": "Feel It Still", "a": "Portugal The Man", "y": 2017, "g": "indie pop", "spotify": "https://open.spotify.com/track/0VBd9ckB9peA09y4i6WaTh"}, {"id": "158", "t": "Party Rock Anthem", "a": "LMFAO", "y": 2011, "g": "electronic", "spotify": "https://open.spotify.com/track/4xkOaSrkexMciUUogZKVTS"}, {"id": "159", "t": "We Are Young", "a": "fun.", "y": 2011, "g": "indie pop", "spotify": "https://open.spotify.com/track/0bAsR2MBBloA7AZyA5JMRY"}, {"id": "160", "t": "Somebody That I Used to Know", "a": "Gotye", "y": 2011, "g": "indie pop", "spotify": "https://open.spotify.com/track/1C2QJNTmsTxCDBuIjcDlou"}, {"id": "161", "t": "We Found Love", "a": "Rihanna", "y": 2011, "g": "electronic", "spotify": "https://open.spotify.com/track/3vGtqTr5he3XOFaMDkMSHP"}, {"id": "162", "t": "Levels", "a": "Avicii", "y": 2011, "g": "electronic", "spotify": "https://open.spotify.com/track/3qvQLQPJFqKGIEFoUP5VRx"}, {"id": "163", "t": "Wake Me Up", "a": "Avicii", "y": 2013, "g": "electronic", "spotify": "https://open.spotify.com/track/0nJW01T7XtvILxQgC5J7Wh"}, {"id": "164", "t": "Animals", "a": "Martin Garrix", "y": 2013, "g": "electronic", "spotify": "https://open.spotify.com/track/2gbsnXkKGqRWR0jSQzLjgm"}, {"id": "165", "t": "Titanium", "a": "David Guetta", "y": 2011, "g": "electronic", "spotify": "https://open.spotify.com/track/3gBZUcNeVumkeeJ19CY2sX"}, {"id": "166", "t": "Vai Malandra", "a": "Anitta", "y": 2017, "g": "funk", "spotify": "https://open.spotify.com/track/0KuMaYfvCvDlnlsJzGCWBi"}, {"id": "167", "t": "Show das Poderosas", "a": "Anitta", "y": 2013, "g": "funk", "spotify": "https://open.spotify.com/track/5eO3IdFHlJvnQMvBkHFDtp"}, {"id": "168", "t": "Ai Se Eu Te Pego", "a": "Michel Teló", "y": 2011, "g": "forró", "spotify": "https://open.spotify.com/track/0A0WKOPhDhWi2wjmLaT2UE"}, {"id": "169", "t": "Largado às Traças", "a": "Zé Neto & Cristiano", "y": 2018, "g": "sertanejo", "spotify": "https://open.spotify.com/track/2S7NhxIzrgQzxlVLpzBqk5"}, {"id": "170", "t": "Amor Perfeito", "a": "Jorge & Mateus", "y": 2010, "g": "sertanejo", "spotify": "https://open.spotify.com/track/6EjHlnFqSO3EloOdpSKvmO"}, {"id": "171", "t": "Cruel Summer", "a": "Taylor Swift", "y": 2019, "g": "pop", "spotify": "https://open.spotify.com/track/1BxfuPKGuaTgP7aM0Chafy"}, {"id": "172", "t": "Señorita", "a": "Shawn Mendes & Camila Cabello", "y": 2019, "g": "pop", "spotify": "https://open.spotify.com/track/0qXGuBm7YF4BFVjTKFPkA1"}, {"id": "173", "t": "Don't Start Now", "a": "Dua Lipa", "y": 2019, "g": "pop", "spotify": "https://open.spotify.com/track/3Ofmpyhv5UAQ70mENzB27r"}, {"id": "174", "t": "New Rules", "a": "Dua Lipa", "y": 2017, "g": "pop", "spotify": "https://open.spotify.com/track/2ekn2ttSfGqwhhate0LSR0"}, {"id": "175", "t": "Counting Stars", "a": "OneRepublic", "y": 2013, "g": "pop rock", "spotify": "https://open.spotify.com/track/73lyF4Vu0HiPSBmkpVBkXs"}, {"id": "176", "t": "Let Her Go", "a": "Passenger", "y": 2012, "g": "folk pop", "spotify": "https://open.spotify.com/track/3TdZ4s4P9I3PMBqpTtSXkI"}, {"id": "177", "t": "A Thousand Years", "a": "Christina Perri", "y": 2011, "g": "pop", "spotify": "https://open.spotify.com/track/2ZSzPg3wpkjGPHjQkHqMO5"}, {"id": "178", "t": "Ho Hey", "a": "The Lumineers", "y": 2012, "g": "folk pop", "spotify": "https://open.spotify.com/track/2r3GrSjAFdGqJEoGHFpT51"}, {"id": "179", "t": "Demons", "a": "Imagine Dragons", "y": 2012, "g": "pop rock", "spotify": "https://open.spotify.com/track/0cqRj7pUJDkTCEsJkx8snD"}, {"id": "180", "t": "Locked Out of Heaven", "a": "Bruno Mars", "y": 2012, "g": "pop rock", "spotify": "https://open.spotify.com/track/2RlgNHKcydI9sayD2Df49e"}, {"id": "181", "t": "Levitating", "a": "Dua Lipa", "y": 2020, "g": "pop", "spotify": "https://open.spotify.com/track/463CkQjx2Zfoaz1D4ghpiP"}, {"id": "182", "t": "Driver's License", "a": "Olivia Rodrigo", "y": 2021, "g": "pop", "spotify": "https://open.spotify.com/track/70swr9OXMeS9GKn1fJuBtZ"}, {"id": "183", "t": "Good 4 U", "a": "Olivia Rodrigo", "y": 2021, "g": "pop punk", "spotify": "https://open.spotify.com/track/4ZtFanR9U6ndgddUvNcjcG"}, {"id": "184", "t": "Industry Baby", "a": "Lil Nas X", "y": 2021, "g": "hip-hop", "spotify": "https://open.spotify.com/track/7DE3GKeNkQ7mJBVBFlkHJR"}, {"id": "185", "t": "Peaches", "a": "Justin Bieber", "y": 2021, "g": "r&b", "spotify": "https://open.spotify.com/track/4iJyoBqLHBCA7KDND1mxEr"}, {"id": "186", "t": "Stay", "a": "The Kid Laroi & Justin Bieber", "y": 2021, "g": "pop", "spotify": "https://open.spotify.com/track/5HCyWlXZPP0y6Eo9suKhGp"}, {"id": "187", "t": "Easy On Me", "a": "Adele", "y": 2021, "g": "pop", "spotify": "https://open.spotify.com/track/7fB1TmZDY1zHnLaGb7RTEG"}, {"id": "188", "t": "Anti-Hero", "a": "Taylor Swift", "y": 2022, "g": "pop", "spotify": "https://open.spotify.com/track/0V3wPSX9ygBnCm8psDIegu"}, {"id": "189", "t": "As It Was", "a": "Harry Styles", "y": 2022, "g": "pop", "spotify": "https://open.spotify.com/track/4Dvkj6JhhA12EX05fT7y2e"}, {"id": "190", "t": "Heat Waves", "a": "Glass Animals", "y": 2020, "g": "indie pop", "spotify": "https://open.spotify.com/track/02MWAaffLxlfxAUY7c5dvB"}, {"id": "191", "t": "Unholy", "a": "Sam Smith & Kim Petras", "y": 2022, "g": "pop", "spotify": "https://open.spotify.com/track/3nqQXoyQOWXiESFLlDF1hG"}, {"id": "192", "t": "Flowers", "a": "Miley Cyrus", "y": 2023, "g": "pop", "spotify": "https://open.spotify.com/track/2dHHgkbq4oTkGQp6r0B8c9"}, {"id": "193", "t": "Physical", "a": "Dua Lipa", "y": 2020, "g": "pop", "spotify": "https://open.spotify.com/track/2QjOHCTQ1Aauc5VDc2AQLS"}, {"id": "194", "t": "Save Your Tears", "a": "The Weeknd", "y": 2020, "g": "synth-pop", "spotify": "https://open.spotify.com/track/2VuSGHZSIlMNWA0IUIsZzW"}, {"id": "195", "t": "Watermelon Sugar", "a": "Harry Styles", "y": 2019, "g": "pop", "spotify": "https://open.spotify.com/track/6UelLqGlWMcVH1E5c4HQCE"}, {"id": "196", "t": "Dynamite", "a": "BTS", "y": 2020, "g": "k-pop", "spotify": "https://open.spotify.com/track/0GBTd9bg0tbR9ZGFBnmtaC"}, {"id": "197", "t": "Butter", "a": "BTS", "y": 2021, "g": "k-pop", "spotify": "https://open.spotify.com/track/4iV4oD6K8TWIA7Ckrk3Nqf"}, {"id": "198", "t": "Shivers", "a": "Ed Sheeran", "y": 2021, "g": "pop", "spotify": "https://open.spotify.com/track/5a7VWQjNjYDPkSHZBaXFTj"}, {"id": "199", "t": "Cold Heart", "a": "Elton John & Dua Lipa", "y": 2021, "g": "pop", "spotify": "https://open.spotify.com/track/3JvrhDOgAt6p7K8mDyZwRd"}, {"id": "200", "t": "Montero", "a": "Lil Nas X", "y": 2021, "g": "pop", "spotify": "https://open.spotify.com/track/7FjZU7XFs7P9W30cxQrVuA"}, {"id": "201", "t": "Mood", "a": "24kGoldn", "y": 2020, "g": "hip-hop", "spotify": "https://open.spotify.com/track/3pidSnouxXufjFnnFJe65Z"}, {"id": "202", "t": "Envolver", "a": "Anitta", "y": 2021, "g": "reggaeton", "spotify": "https://open.spotify.com/track/5Hc5zQy4sPVzFTI4p4iNqQ"}, {"id": "203", "t": "Forro do Elétrico", "a": "Barões da Pisadinha", "y": 2020, "g": "forró", "spotify": "https://open.spotify.com/track/4g36s3T1KK6jTzxfLbKvqH"}, {"id": "204", "t": "Traição", "a": "Marília Mendonça", "y": 2019, "g": "sertanejo", "spotify": "https://open.spotify.com/track/51La3gpiFhR5vVTOQqlhvv"}, {"id": "205", "t": "Ghost", "a": "Justin Bieber", "y": 2021, "g": "pop", "spotify": "https://open.spotify.com/track/3VAKgbLjXFfFHfcDtnqHm4"}, {"id": "206", "t": "About Damn Time", "a": "Lizzo", "y": 2022, "g": "pop", "spotify": "https://open.spotify.com/track/4OQ3tq5cBnRRHALPDeqCVS"}, {"id": "207", "t": "Golden Hour", "a": "JVKE", "y": 2022, "g": "pop", "spotify": "https://open.spotify.com/track/5odlY52u43F5BjByhxg7wg"}, {"id": "208", "t": "Kill Bill", "a": "SZA", "y": 2022, "g": "r&b", "spotify": "https://open.spotify.com/track/1T9sEPXDpRi9hlfNNhCpHa"}, {"id": "209", "t": "Glimpse of Us", "a": "Joji", "y": 2022, "g": "r&b", "spotify": "https://open.spotify.com/track/6AkHUc5LkcJrfgrFQilWZ4"}, {"id": "210", "t": "Grenade", "a": "Bruno Mars", "y": 2010, "g": "pop", "spotify": "https://open.spotify.com/track/0Du5cEVh5yTK9QJze8zA0C"}, {"id": "211", "t": "Just the Way You Are", "a": "Bruno Mars", "y": 2010, "g": "pop", "spotify": "https://open.spotify.com/track/6DNqjmMUNRJlkD7OVm74PF"}, {"id": "212", "t": "Treasure", "a": "Bruno Mars", "y": 2012, "g": "pop", "spotify": "https://open.spotify.com/track/0QkORVMiyL5k5h3iCKDsGR"}, {"id": "213", "t": "24K Magic", "a": "Bruno Mars", "y": 2016, "g": "funk", "spotify": "https://open.spotify.com/track/5Sl39G74U7EBs2bhBVgjLz"}, {"id": "214", "t": "That's What I Like", "a": "Bruno Mars", "y": 2016, "g": "funk", "spotify": "https://open.spotify.com/track/3WPDekQUqVORxKPbAjBZuZ"}, {"id": "215", "t": "Finesse", "a": "Bruno Mars", "y": 2016, "g": "funk", "spotify": "https://open.spotify.com/track/7i2DJ0mGDKPUiuomLJsEjY"}, {"id": "216", "t": "Stitches", "a": "Shawn Mendes", "y": 2015, "g": "pop", "spotify": "https://open.spotify.com/track/4H1az5k0HWGAK6hKDSQQKN"}, {"id": "217", "t": "Treat You Better", "a": "Shawn Mendes", "y": 2016, "g": "pop", "spotify": "https://open.spotify.com/track/4dpIJFUwYmqCwHkRMnIXQH"}, {"id": "218", "t": "IDGAF", "a": "Dua Lipa", "y": 2018, "g": "pop", "spotify": "https://open.spotify.com/track/2N9OvqfCYeVdJI2aFrzmvN"}, {"id": "219", "t": "Break My Heart", "a": "Dua Lipa", "y": 2020, "g": "pop", "spotify": "https://open.spotify.com/track/6KrNbMMISyXHNHvIQcB5BZ"}, {"id": "220", "t": "SAD!", "a": "XXXTENTACION", "y": 2018, "g": "hip-hop", "spotify": "https://open.spotify.com/track/2LDuFB7G7x1sHJbFtKZPCg"}, {"id": "221", "t": "Elastic Heart", "a": "Sia", "y": 2015, "g": "pop", "spotify": "https://open.spotify.com/track/2q8yz6mRqHJzxVFWHNzEfg"}, {"id": "222", "t": "Team", "a": "Lorde", "y": 2013, "g": "indie pop", "spotify": "https://open.spotify.com/track/1TKTiKp3zbFgrklwwGNLVL"}, {"id": "223", "t": "Say Something", "a": "A Great Big World", "y": 2013, "g": "pop", "spotify": "https://open.spotify.com/track/0FDzzruyVECATHjKnHczu4"}, {"id": "224", "t": "Ho Hey", "a": "The Lumineers", "y": 2012, "g": "folk pop", "spotify": "https://open.spotify.com/track/7sSdgJbF0snGZHpWRhLuiZ"}, {"id": "225", "t": "It's Time", "a": "Imagine Dragons", "y": 2012, "g": "pop rock", "spotify": "https://open.spotify.com/track/1Lbm7ujSGJVKcBSL7l0A0V"}, {"id": "226", "t": "Natural", "a": "Imagine Dragons", "y": 2018, "g": "pop rock", "spotify": "https://open.spotify.com/track/7xyFSXtlkMCLJbFEQr7mhA"}, {"id": "227", "t": "Enemy", "a": "Imagine Dragons", "y": 2021, "g": "pop rock", "spotify": "https://open.spotify.com/track/2tznHmp70DxMyr2XhWLOW0"}, {"id": "228", "t": "Bones", "a": "Imagine Dragons", "y": 2022, "g": "pop rock", "spotify": "https://open.spotify.com/track/2Zs6AJXE3tKomFyLEMpRQP"}, {"id": "229", "t": "Hung Up", "a": "Madonna", "y": 2005, "g": "pop", "spotify": "https://open.spotify.com/track/2s0T1EYuPiBLJzYmEHFQe1"}, {"id": "230", "t": "Papa Don't Preach", "a": "Madonna", "y": 1986, "g": "pop", "spotify": "https://open.spotify.com/track/26EM9kosMRxHb9WNVQ7eVD"}, {"id": "231", "t": "Quando a Chuva Passar", "a": "Djavan", "y": 1982, "g": "mpb", "spotify": "https://open.spotify.com/track/6GOsyI4Rz6xr9nqe8nluBP"}, {"id": "232", "t": "Você é Linda", "a": "Caetano Veloso", "y": 1994, "g": "mpb", "spotify": "https://open.spotify.com/track/3w3y8KPKCMHLSiMhFHDLYJ"}, {"id": "233", "t": "Recairei", "a": "Gusttavo Lima", "y": 2020, "g": "sertanejo", "spotify": "https://open.spotify.com/track/5hSPuoqPBaXFwEVBKE3jxL"}, {"id": "234", "t": "Permission to Dance", "a": "BTS", "y": 2021, "g": "k-pop", "spotify": "https://open.spotify.com/track/5WvbVoOu8pIfGR9jbLi7F8"}, {"id": "235", "t": "Something Just Like This", "a": "Chainsmokers & Coldplay", "y": 2017, "g": "pop", "spotify": "https://open.spotify.com/track/3T4tUhGYeRNVUGevb0wThu"}, {"id": "236", "t": "Can't Stop the Feeling", "a": "Justin Timberlake", "y": 2016, "g": "pop", "spotify": "https://open.spotify.com/track/1fNLhAkIBHLMRHVMF9eCIG"}, {"id": "237", "t": "Love Yourself", "a": "Justin Bieber", "y": 2015, "g": "pop", "spotify": "https://open.spotify.com/track/7DM4BPaS7uofFul3ywMe8v"}, {"id": "238", "t": "Cheap Thrills", "a": "Sia", "y": 2016, "g": "pop", "spotify": "https://open.spotify.com/track/5FfkFhvYCt7ioAq2GbIc2X"}, {"id": "239", "t": "Lean On", "a": "Major Lazer", "y": 2015, "g": "electronic", "spotify": "https://open.spotify.com/track/3igMlvqFxJIZaVqXsWuRbD"}, {"id": "240", "t": "Attention", "a": "Charlie Puth", "y": 2017, "g": "pop", "spotify": "https://open.spotify.com/track/2d9SuuSYJBxkYY3eTjGxYN"}, {"id": "241", "t": "Man in the Mirror", "a": "Michael Jackson", "y": 1987, "g": "pop", "spotify": "https://open.spotify.com/track/2x9jInsZy9g6CEKBzwsUDZ"}, {"id": "242", "t": "Black or White", "a": "Michael Jackson", "y": 1991, "g": "pop", "spotify": "https://open.spotify.com/track/4rb2qCQxMTCEyupnQdyWtg"}, {"id": "243", "t": "Quando Você Passar", "a": "Djavan", "y": 1982, "g": "mpb", "spotify": "https://open.spotify.com/track/0cXJbNz7dPIRbEQ0J15RGZ"}, {"id": "244", "t": "Vamos Fugir", "a": "Gilberto Gil", "y": 1984, "g": "mpb", "spotify": "https://open.spotify.com/track/0lJ6sbmRsLYFEMTOLhf2gL"}, {"id": "245", "t": "Anunciação", "a": "Alceu Valença", "y": 1982, "g": "mpb", "spotify": "https://open.spotify.com/track/1IFEtgIJFwQWp3D8ihzNKZ"}, {"id": "246", "t": "La Isla Bonita", "a": "Madonna", "y": 1987, "g": "pop", "spotify": "https://open.spotify.com/track/5EXBblLtLGKKFuU8MLwpGv"}, {"id": "247", "t": "Material Girl", "a": "Madonna", "y": 1984, "g": "pop", "spotify": "https://open.spotify.com/track/4djdkGhcFDFmfTOBZpCEGK"}, {"id": "248", "t": "True Blue", "a": "Madonna", "y": 1986, "g": "pop", "spotify": "https://open.spotify.com/track/4iYE8lgFvKhbH2V5fUJOfY"}, {"id": "249", "t": "Escapism", "a": "RAYE", "y": 2022, "g": "r&b", "spotify": "https://open.spotify.com/track/4g5R9fdU6v7to6BI7PvNwE"}, {"id": "250", "t": "About Damn Time (Remix)", "a": "Lizzo & Cardi B", "y": 2022, "g": "pop", "spotify": "https://open.spotify.com/track/5gGsMZr1FDcq8C7bJaGWBl"}];
+var DB = [
+  { id: "001", t: "See You Later, Alligator", a: "Bill Haley & His Comets", y: 1959, spotify: "https://open.spotify.com/track/05eNEozACh10Rn0ewFnH8Y" },
+  { id: "002", t: "Alegria, Alegria", a: "Caetano Veloso", y: 1967, spotify: "https://open.spotify.com/track/0aoQV1TuaTrcpJaMfJ3wgj" },
+  { id: "003", t: "Relax, Take It Easy", a: "MIKA", y: 2006, spotify: "https://open.spotify.com/track/0KM2y796j63t5RHhvRUxld" },
+  { id: "004", t: "Jumpin', Jumpin'", a: "Destiny's Child", y: 2002, spotify: "https://open.spotify.com/track/1kbe64LHKlyD0nXUoa4mum" },
+  { id: "005", t: "Monday, Monday", a: "The Mamas & The Papas", y: 1966, spotify: "https://open.spotify.com/track/3EFb1qDgIqf9MegIryKtDj" },
+  { id: "006", t: "Sugar, Sugar", a: "The Archies", y: 2007, spotify: "https://open.spotify.com/track/3iSws76HjaU7k49EqJVTfF" },
+  { id: "007", t: "Oh, Pretty Woman", a: "Roy Orbison", y: 1962, spotify: "https://open.spotify.com/track/48i055G1OT5KxGGftwFxWy" },
+  { id: "008", t: "Hey, Soul Sister", a: "Train", y: 2010, spotify: "https://open.spotify.com/track/4HlFJV71xXKIGcU3kRyttv" },
+  { id: "009", t: "Mas, Que Nada!", a: "Jorge Ben Jor", y: 1963, spotify: "https://open.spotify.com/track/6U03Orwr5Dxt8jahLnQpYV" },
+  { id: "010", t: "Signed, Sealed, Delivered (I'm Yours)", a: "Stevie Wonder", y: 1970, spotify: "https://open.spotify.com/track/2eF8pWbiivYsYRpbntYsnc" },
+  { id: "011", t: "You're The First, The Last, My Everything", a: "Barry White", y: 1974, spotify: "https://open.spotify.com/track/5dXJ1SoksFkgdx3yxIoYNO" },
+  { id: "012", t: "Filho maravilha (Fio maravilha)", a: "Maria Alcina", y: 1974, spotify: "https://open.spotify.com/track/5elV0XROI5Nnij88fWoAMC" },
+  { id: "013", t: "Tédio", a: "Biquini Cavadão", y: 1986, spotify: "https://open.spotify.com/track/356WKxlF1H7oA2q6rdVaMh" },
+  { id: "014", t: "Knock On Wood", a: "Amii Stewart", y: 2012, spotify: "https://open.spotify.com/track/6120uJUyg6QDzaAJUosTx5" },
+  { id: "015", t: "Itsy Bitsy Teenie Weenie Yellow Polka Dot Bikini", a: "Brian Hyland", y: 1961, spotify: "https://open.spotify.com/track/4aTCNddtjztjuK2EOgz7ZZ" },
+  { id: "016", t: "Cheap Thrills", a: "Sia", y: 2016, spotify: "https://open.spotify.com/track/27SdWb2rFzO6GWiYDBTD9j" },
+  { id: "017", t: "Just Give Me a Reason (feat. Nate Ruess)", a: "P!nk, Nate Ruess", y: 2012, spotify: "https://open.spotify.com/track/1mKXFLRA179hdOWQBwUk9e" },
+  { id: "018", t: "It Wasn't Me", a: "Shaggy, Rik Rok", y: 2000, spotify: "https://open.spotify.com/track/3WkibOpDF7cQ5xntM1epyf" },
+  { id: "019", t: "Há Tempos", a: "Legião Urbana", y: 1989, spotify: "https://open.spotify.com/track/0YUVtMGgaJj55WAr7AHRvY" },
+  { id: "020", t: "Volare (Nel Blu di Pinto di Blu)", a: "Gipsy Kings", y: 1989, spotify: "https://open.spotify.com/track/4OjJAGDDZTLlTNeOMBl7UM" },
+  { id: "021", t: "Trem Das Onze", a: "Adoniran Barbosa", y: 1974, spotify: "https://open.spotify.com/track/2TI5GBkbrrFtZRM5v1heeb" },
+  { id: "022", t: "Piece of My Heart", a: "Erma Franklin", y: 2009, spotify: "https://open.spotify.com/track/2GbePPrWWSRxcmW6QRSPae" },
+  { id: "023", t: "Never Gonna Give You Up", a: "Rick Astley", y: 1987, spotify: "https://open.spotify.com/track/4cOdK2wGLETKBW3PvgPWqT" },
+  { id: "024", t: "Flashdance...What a Feeling", a: "Irene Cara", y: 1983, spotify: "https://open.spotify.com/track/3cbV252akVZInSvJk7jAYX" },
+  { id: "025", t: "Sweet Dreams (Are Made of This)", a: "Eurythmics, Annie Lennox, Dave Stewart", y: 1983, spotify: "https://open.spotify.com/track/6oWLiyRpo1ibp2vKNxHG0T" },
+  { id: "026", t: "Thunderstruck", a: "AC/DC", y: 1990, spotify: "https://open.spotify.com/track/57bgtoPSgt236HzfBOd8kj" },
+  { id: "027", t: "Dragostea din tei", a: "O-Zone", y: 2004, spotify: "https://open.spotify.com/track/52Zr0sinhWTCRrQhRRY4EP" },
+  { id: "028", t: "Don't You Want Me", a: "The Human League", y: 1981, spotify: "https://open.spotify.com/track/3L7RtEcu1Hw3OXrpnthngx" },
+  { id: "029", t: "Kátia Flávia, Godia de Irajá", a: "Fausto Fawcett e Os Robôs Efêmeros", y: 2016, spotify: "https://open.spotify.com/track/5CJi4BG1lGSXwSx3UI1u5Q" },
+  { id: "030", t: "Thunder", a: "Imagine Dragons", y: 2017, spotify: "https://open.spotify.com/track/1zB4vmk8tFRmM9UULNzbLB" },
+  { id: "031", t: "Smoke Gets In Your Eyes", a: "The Platters", y: 1986, spotify: "https://open.spotify.com/track/57yz5oqMytzbwdewSG28L9" },
+  { id: "032", t: "Without You (feat. Sandro Cavazza)", a: "Avicii, Sandro Cavazza", y: 2017, spotify: "https://open.spotify.com/track/6Pgkp4qUoTmJIPn7ReaGxL" },
+  { id: "033", t: "Wrecking Ball", a: "Miley Cyrus", y: 2013, spotify: "https://open.spotify.com/track/2vwlzO0Qp8kfEtzTsCXfyE" },
+  { id: "034", t: "Hit The Road Jack", a: "Ray Charles", y: 2021, spotify: "https://open.spotify.com/track/108FCXU31Z0pRK9VGVnJPm" },
+  { id: "035", t: "Moves Like Jagger", a: "Maroon 5, Christina Aguilera", y: 2011, spotify: "https://open.spotify.com/track/0HqeTDZMGlYDmgGGVFQrSg" },
+  { id: "036", t: "Informer", a: "Snow", y: 1993, spotify: "https://open.spotify.com/track/2LjiPAQOVazT8sRyXL3XRs" },
+  { id: "037", t: "Essa Tal Liberdade", a: "Só Pra Contrariar", y: 1994, spotify: "https://open.spotify.com/track/3EjxAbEOH28icEK1ZFOUSh" },
+  { id: "038", t: "Infiel", a: "Marília Mendonça", y: 2019, spotify: "https://open.spotify.com/track/05bVdbvZcZ8QaZBLJdPhlK" },
+  { id: "039", t: "Escape (The Pina Colada Song)", a: "Rupert Holmes", y: 1979, spotify: "https://open.spotify.com/track/5IMtdHjJ1OtkxbGe4zfUxQ" },
+  { id: "040", t: "Have A Nice Day", a: "Stereophonics", y: 2001, spotify: "https://open.spotify.com/track/6JWddKPdqvDc2WkPEi9grC" },
+  { id: "041", t: "Top Of The World", a: "Carpenters", y: 2000, spotify: "https://open.spotify.com/track/5ee20xB17u8TX7IUWDNed6" },
+  { id: "042", t: "Quebre As Correntes", a: "Fresno", y: 2006, spotify: "https://open.spotify.com/track/26VzA1ncohB7RMsxpXWaZx" },
+  { id: "043", t: "I Got You (I Feel Good)", a: "James Brown & The Famous Flames", y: 1966, spotify: "https://open.spotify.com/track/5haXbSJqjjM0TCJ5XkfEaC" },
+  { id: "044", t: "Maria Maria", a: "Milton Nascimento", y: 1978, spotify: "https://open.spotify.com/track/1nl13AcSpiCKdbkhtvJoo7" },
+  { id: "045", t: "Piano Man", a: "Billy Joel", y: 1973, spotify: "https://open.spotify.com/track/78WVLOP9pN0G3gRLFy1rAa" },
+  { id: "046", t: "Vou Festejar", a: "Beth Carvalho", y: 1978, spotify: "https://open.spotify.com/track/54JLlb23AnzXErLRSNVIUn" },
+  { id: "047", t: "Dancing On The Ceiling", a: "Lionel Richie", y: 1986, spotify: "https://open.spotify.com/track/0snPJPxkk0MbTc0xeUvAPt" },
+  { id: "048", t: "MacArthur Park", a: "Donna Summer", y: 1979, spotify: "https://open.spotify.com/track/42tYHqMxXxXHAAWqLaoOfQ" },
+  { id: "049", t: "Purple Rain", a: "Prince", y: 1984, spotify: "https://open.spotify.com/track/54X78diSLoUDI3joC2bjMz" },
+  { id: "050", t: "Tá Rocheda", a: "Os Barões Da Pisadinha", y: 2019, spotify: "https://open.spotify.com/track/3dPvQLKl42dMYWV4LWRTLK" },
+  { id: "051", t: "No Son Of Mine", a: "Genesis", y: 2004, spotify: "https://open.spotify.com/track/2nHajACLqGsbctpe3Rafh3" },
+  { id: "052", t: "Alagados", a: "Os Paralamas Do Sucesso, Gilberto Gil", y: 1986, spotify: "https://open.spotify.com/track/0C2G51IpAbS8y7Jt1tyHMv" },
+  { id: "053", t: "Heart Of Glass", a: "Blondie", y: 2006, spotify: "https://open.spotify.com/track/41AE8ODX2JETBCa6muhSLY" },
+  { id: "054", t: "Milla", a: "Netinho", y: 1996, spotify: "https://open.spotify.com/track/22Ekdb1dJdXVDckNpZGZLG" },
+  { id: "055", t: "These Boots Are Made for Walkin'", a: "Nancy Sinatra", y: 1987, spotify: "https://open.spotify.com/track/4j2W1eM03mz5MVN5LvR7VH" },
+  { id: "056", t: "Crazy In Love (feat. JAY-Z)", a: "Beyoncé, JA-Z", y: 2003, spotify: "https://open.spotify.com/track/5IVuqXILoxVWvWEPm82Jxr" },
+  { id: "057", t: "In the Summertime", a: "Mungo Jerry", y: 1971, spotify: "https://open.spotify.com/track/7jhKkbM3KZvnuqzMX5fADH" },
+  { id: "058", t: "Garota Nacional", a: "Skank", y: 1996, spotify: "https://open.spotify.com/track/7DoBn08dqKS9MmtZiZChVD" },
+  { id: "059", t: "True Colors", a: "Cyndi Lauper", y: 1986, spotify: "https://open.spotify.com/track/2A6yzRGMgSQCUapR2ptm6A" },
+  { id: "060", t: "Hey Ya!", a: "Outkast", y: 2003, spotify: "https://open.spotify.com/track/2PpruBYCo4H7WOBJ7Q2EwM" },
+  { id: "061", t: "Guajira Guantanamera", a: "Joseito Fernández", y: 2012, spotify: "https://open.spotify.com/track/0KMGf0ebdR8aazf1PoHEdb" },
+  { id: "062", t: "bad guy", a: "Billie Eilish", y: 2019, spotify: "https://open.spotify.com/track/2Fxmhks0bxGSBdJ92vM42m" },
+  { id: "063", t: "Haven't Met You Yet", a: "Michael Bublé", y: 2009, spotify: "https://open.spotify.com/track/4iMdiQO0YJwEkWf8eI2wff" },
+  { id: "064", t: "O Mar Serenou", a: "Clara Nunes", y: 1975, spotify: "https://open.spotify.com/track/5hemN5gGcBNdkUOIbs3RVe" },
+  { id: "065", t: "I'm a Believer", a: "The Monkees", y: 1967, spotify: "https://open.spotify.com/track/3G7tRC24Uh09Hmp1KZ7LQ2" },
+  { id: "066", t: "Ragatanga (Asereje)", a: "Rouge", y: 2002, spotify: "https://open.spotify.com/track/7aSwDCjueXPEIf3OeZiRFR" },
+  { id: "067", t: "Cheia de Manias", a: "Raça Negra", y: 1992, spotify: "https://open.spotify.com/track/5R8XzDagArO2BwLIrQJTPf" },
+  { id: "068", t: "I Love It (feat. Charli XCX)", a: "Icona Pop, Charli xcx", y: 2013, spotify: "https://open.spotify.com/track/2U8NXPTXZWG2O0ye2sYRiH" },
+  { id: "069", t: "Ironic", a: "Alanis Morissette", y: 1995, spotify: "https://open.spotify.com/track/1d6KS9GH06JAd19uiBy9IE" },
+  { id: "070", t: "All of Me", a: "John Legend", y: 2013, spotify: "https://open.spotify.com/track/3U4isOIWM3VvDubwSI3y7a" },
+  { id: "071", t: "Born To Be Wild", a: "Steppenwolf", y: 1968, spotify: "https://open.spotify.com/track/63OFKbMaZSDZ4wtesuuq6f" },
+  { id: "072", t: "Arrastão", a: "Elis Regina", y: 2013, spotify: "https://open.spotify.com/track/3u70XHB13btIIcdjh6pi3I" },
+  { id: "073", t: "More Than a Feeling", a: "Boston", y: 1976, spotify: "https://open.spotify.com/track/1QEEqeFIZktqIpPI4jSVSF" },
+  { id: "074", t: "Não Deixe O Samba Morrer", a: "Alcione", y: 1975, spotify: "https://open.spotify.com/track/5iq4NDi4fznJJRLL1rXNE4" },
+  { id: "075", t: "Get Lucky (feat. Pharrell Williams and Nile Rodgers)", a: "Daft Punk, Pharrell Williams, Nile Rodgers", y: 2013, spotify: "https://open.spotify.com/track/69kOkLUCkxIZYexIgSG8rq" },
+  { id: "076", t: "Viva La Vida", a: "Coldplay", y: 2008, spotify: "https://open.spotify.com/track/3Fcfwhm8oRrBvBZ8KGhtea" },
+  { id: "077", t: "Quero Te Encontrar", a: "Claudinho & Buchecha", y: 1997, spotify: "https://open.spotify.com/track/3AYcFdYKSL8mVqJWwCpS60" },
+  { id: "078", t: "A Cura", a: "Lulu Santos", y: 1988, spotify: "https://open.spotify.com/track/4njyR80QqZZQsXd4Oh2L1i" },
+  { id: "079", t: "Wannabe", a: "Spice Girls", y: 1996, spotify: "https://open.spotify.com/track/1Je1IMUlBXcx1Fz0WE7oPT" },
+  { id: "080", t: "Easy", a: "Commodores", y: 1977, spotify: "https://open.spotify.com/track/1JQ6Xm1JrvHfvAqhl5pwaA" },
+  { id: "081", t: "4 Minutes (feat. Justin Timberlake and Timbaland)", a: "Madonna", y: 2008, spotify: "https://open.spotify.com/track/1dDNz8h95Gsu0W4QdxVVln" },
+  { id: "082", t: "Borboletas", a: "Victor & Leo", y: 2008, spotify: "https://open.spotify.com/track/1Go5sZ2OZeWNyskKsX2CFW" },
+  { id: "083", t: "Hotel California", a: "Eagles", y: 1976, spotify: "https://open.spotify.com/track/40riOy7x9W7GXjyGp4pjAv" },
+  { id: "084", t: "Johnny B. Goode", a: "Chuck Berry", y: 1959, spotify: "https://open.spotify.com/track/2QfiRTz5Yc8DdShCxG1tB2" },
+  { id: "085", t: "Start Me Up", a: "The Rolling Stones", y: 1981, spotify: "https://open.spotify.com/track/7HKez549fwJQDzx3zLjHKC" },
+  { id: "086", t: "Rigoletto: \\La Donna E' Mobile\\", a: "Enrico Caruso", y: 2011, spotify: "https://open.spotify.com/track/7idTMG6EKZy0531lIx8RJ5" },
+  { id: "087", t: "Pesadão", a: "IZA, Marcelo Falcão", y: 2018, spotify: "https://open.spotify.com/track/2nPYWC7Jtd3gsd1iMQT3Vs" },
+  { id: "088", t: "Girl You Know It's True", a: "Milli Vanilli", y: 2010, spotify: "https://open.spotify.com/track/41CMr8zZ7cMcjL0U4En6gZ" },
+  { id: "089", t: "Disco Inferno", a: "The Trammps", y: 1976, spotify: "https://open.spotify.com/track/5jUA1njy3h6ynHLvPdEVHt" },
+  { id: "090", t: "Blue Bayou", a: "Linda Ronstadt", y: 1977, spotify: "https://open.spotify.com/track/3zxklD2EGecZre9MjEEvIU" },
+  { id: "091", t: "Aquele Abraço", a: "Gilberto Gil", y: 1969, spotify: "https://open.spotify.com/track/7CjSjWTdVPD0ov82Qz55Xb" },
+  { id: "092", t: "Like a Prayer", a: "MadHouse", y: 2002, spotify: "https://open.spotify.com/track/0PLGnOgmf8RPgZNkaaSYyM" },
+  { id: "093", t: "Com Que Roupa?", a: "Noel Rosa", y: 1930, spotify: "https://open.spotify.com/track/5jZPVnBbi0mktxf6xHwr7t" },
+  { id: "094", t: "Every Breath You Take", a: "The Police", y: 1983, spotify: "https://open.spotify.com/track/1JSTJqkT5qHq8MDJnJbRE1" },
+  { id: "095", t: "Scars To Your Beautiful", a: "Alessia Cara", y: 2016, spotify: "https://open.spotify.com/track/42ydLwx4i5V49RXHOozJZq" },
+  { id: "096", t: "Call on Me - Radio Mix", a: "Eric Prydz", y: 2004, spotify: "https://open.spotify.com/track/1xNcBAoUw8Hz6LqK2jt4Ff" },
+  { id: "097", t: "The Rhythm of the Night", a: "Corona", y: 1994, spotify: "https://open.spotify.com/track/0ofMkI3jzmGCElAOgOLeo3" },
+  { id: "098", t: "All About That Bass", a: "Meghan Trainor", y: 2015, spotify: "https://open.spotify.com/track/5jE48hhRu8E6zBDPRSkEq7" },
+  { id: "099", t: "Alive", a: "Pearl Jam", y: 1991, spotify: "https://open.spotify.com/track/1L94M3KIu7QluZe63g64rv" },
+  { id: "100", t: "(We're Gonna) Rock Around The Clock", a: "Bill Haley & His Comets", y: 1955, spotify: "https://open.spotify.com/track/1uRKT2LRANv4baowBWHfDS" },
+  { id: "101", t: "Balancê", a: "Gal Costa", y: 1979, spotify: "https://open.spotify.com/track/2m1G38M0gJuE4aVPh0tmIP" },
+  { id: "102", t: "Lambada", a: "Kaoma", y: 1989, spotify: "https://open.spotify.com/track/32gpJnMZkRafZdQvU7ZzR7" },
+  { id: "103", t: "Menina Veneno", a: "Ritchie", y: 1983, spotify: "https://open.spotify.com/track/6qlb3j0zGqEe6uWJpQZGxP" },
+  { id: "104", t: "Congratulations", a: "Cliff Richard", y: 2008, spotify: "https://open.spotify.com/track/1SOAN58QwnQABl2SND1wMh" },
+  { id: "105", t: "Manuel", a: "Ed Motta", y: 1988, spotify: "https://open.spotify.com/track/3EqXUkR4x6l5UzzV9Jwi5i" },
+  { id: "106", t: "Dança Da Cordinha", a: "É O Tchan", y: 1996, spotify: "https://open.spotify.com/track/39vg0qbCDVS2dCPHsW8a19" },
+  { id: "107", t: "Under the Bridge", a: "Red Hot Chili Peppers", y: 1991, spotify: "https://open.spotify.com/track/3d9DChrdc6BOeFsbrZ3Is0" },
+  { id: "108", t: "Ubuntu Fristaili", a: "Emicida", y: 2013, spotify: "https://open.spotify.com/track/3G3PPoNXTdirajaiIFh11y" },
+  { id: "109", t: "Gangsta's Paradise", a: "Coolio, L.V.", y: 1995, spotify: "https://open.spotify.com/track/1DIXPcTDzTj8ZMHt3PDt8p" },
+  { id: "110", t: "You Can't Hurry Love", a: "The Supremes", y: 1966, spotify: "https://open.spotify.com/track/4H1iMlEWKZmpKTHCZzDhju" },
+  { id: "111", t: "Because of You", a: "Kelly Clarkson", y: 2004, spotify: "https://open.spotify.com/track/0gJvqi9QyASOCtJu99tytc" },
+  { id: "112", t: "Olhos Coloridos", a: "Sandra De Sá", y: 1982, spotify: "https://open.spotify.com/track/45XopGhwYSgooiewaZNsSd" },
+  { id: "113", t: "Xote Dos Milagres", a: "Falamansa", y: 2000, spotify: "https://open.spotify.com/track/3uCg5JVHl2E6i8gFJxUjsp" },
+  { id: "114", t: "Adocica", a: "Beto Barbosa", y: 1988, spotify: "https://open.spotify.com/track/7caTsla72UAbXnmXiWOQsD" },
+  { id: "115", t: "Flor de Lis", a: "Djavan", y: 1976, spotify: "https://open.spotify.com/track/1TX4h6MrIZ0K3r4OOG11WO" },
+  { id: "116", t: "Sem Medo de Ser Feliz", a: "Zezé Di Camargo & Luciano", y: 1995, spotify: "https://open.spotify.com/track/3u3G8q8xzUv3ujZ59DLKzU" },
+  { id: "117", t: "Fogo E Paixão", a: "Wando", y: 1985, spotify: "https://open.spotify.com/track/3nQel9kt9Yn1ZeQy8CUoPH" },
+  { id: "118", t: "Jailhouse Rock", a: "Elvis Presley", y: 1958, spotify: "https://open.spotify.com/track/4gphxUgq0JSFv2BCLhNDiE" },
+  { id: "119", t: "It's In The Kiss (The Shoop Shoop Song)", a: "Betty Everett", y: 2010, spotify: "https://open.spotify.com/track/35hfuechuOqaW31ogdauO7" },
+  { id: "120", t: "As It Was", a: "Harry Styles", y: 2022, spotify: "https://open.spotify.com/track/4Dvkj6JhhA12EX05fT7y2e" },
+  { id: "121", t: "Bang", a: "Anitta", y: 2015, spotify: "https://open.spotify.com/track/1Cml3fnCNLZUC1EEtkcgVb" },
+  { id: "122", t: "Day-O (The Banana Boat Song)", a: "Harry Belafonte", y: 2001, spotify: "https://open.spotify.com/track/6FH2WiSVFv5qglEg1O8xNn" },
+  { id: "123", t: "Blinding Lights", a: "The Weeknd", y: 2020, spotify: "https://open.spotify.com/track/0VjIjW4GlUZAMYd2vXMi3b" },
+  { id: "124", t: "Lollipop", a: "The Chordettes", y: 2011, spotify: "https://open.spotify.com/track/6M7WQZ4tAG72j2xXxi2a1z" },
+  { id: "125", t: "Feel", a: "Robbie Williams", y: 2002, spotify: "https://open.spotify.com/track/2Ms33RTRCT6gArrpcrPxmo" },
+  { id: "126", t: "No One", a: "Alicia Keys", y: 2007, spotify: "https://open.spotify.com/track/6IwKcFdiRQZOWeYNhUiWIv" },
+  { id: "127", t: "Respect", a: "Aretha Franklin", y: 1967, spotify: "https://open.spotify.com/track/7s25THrKz86DM225dOYwnr" },
+  { id: "128", t: "Do Wah Diddy Diddy", a: "Manfred Mann", y: 1964, spotify: "https://open.spotify.com/track/7gEpTMp9MQc1uJwivtL37R" },
+  { id: "129", t: "Happy - From \\Despicable Me 2\\", a: "Pharrell Williams", y: 2014, spotify: "https://open.spotify.com/track/60nZcImufyMA1MKQY3dcCH" },
+  { id: "130", t: "Nem Vem Que Não Tem", a: "Wilson Simonal", y: 1967, spotify: "https://open.spotify.com/track/0oL8aqq5iRE5SnxdxJ6FbK" },
+  { id: "131", t: "Levo Comigo", a: "Restart", y: 2010, spotify: "https://open.spotify.com/track/6BcqNZ7D3gI0ALivZMAvux" },
+  { id: "132", t: "Estúpido Cupido", a: "Celly Campello", y: 1959, spotify: "https://open.spotify.com/track/7AHcq1TTLsgbnspP1TsP9U" },
+  { id: "133", t: "Shout", a: "Tears For Fears", y: 1985, spotify: "https://open.spotify.com/track/2gQaQUhDCNGfBVXTvxAmXQ" },
+  { id: "134", t: "2345MEIA78", a: "Gabriel O Pensador", y: 1997, spotify: "https://open.spotify.com/track/1AqfIfEQyEaME7fiv3HzyU" },
+  { id: "135", t: "I Heard It Through The Grapevine", a: "Marvin Gaye", y: 1968, spotify: "https://open.spotify.com/track/1tqT6DhmsrtQgyCKUwotiw" },
+  { id: "136", t: "Torn", a: "Natalie Imbruglia", y: 1997, spotify: "https://open.spotify.com/track/1Jaah2tmN9Hv81A87KZ1MU" },
+  { id: "137", t: "Don't Dream It's Over", a: "Crowded House", y: 1986, spotify: "https://open.spotify.com/track/56GbZVwxMdf1DENCluYS8A" },
+  { id: "138", t: "Under Pressure", a: "Queen, David Bowie", y: 1982, spotify: "https://open.spotify.com/track/2fuCquhmrzHpu5xcA1ci9x" },
+  { id: "139", t: "Dilemma (feat. Kelly Rowland)", a: "Nelly, Kelly Rowland", y: 2002, spotify: "https://open.spotify.com/track/14MgTooapmJdLlEMAr2zAM" },
+  { id: "140", t: "Murder On The Dancefloor", a: "Sophie Ellis-Bextor", y: 2002, spotify: "https://open.spotify.com/track/2Za2mUwmQoSxWPscaY2vxl" },
+  { id: "141", t: "With Or Without You", a: "U2", y: 1998, spotify: "https://open.spotify.com/track/1Og8U5KRel9D51h4bmznlE" },
+  { id: "142", t: "Ice Ice Baby", a: "Vanilla Ice", y: 1990, spotify: "https://open.spotify.com/track/11d9oUiwHuYt216EFA2tiz" },
+  { id: "143", t: "Self Esteem", a: "The Offspring", y: 1994, spotify: "https://open.spotify.com/track/1FkoVC85Ds3mFoK0fVqEqP" },
+  { id: "144", t: "Celebration", a: "Kool & The Gang", y: 1980, spotify: "https://open.spotify.com/track/3K7Q9PHUWPTaknlbFPThn2" },
+  { id: "145", t: "About Damn Time", a: "Lizzo", y: 2022, spotify: "https://open.spotify.com/track/1PckUlxKqWQs3RlWXVBLw3" },
+  { id: "146", t: "Sweet Child O' Mine", a: "Guns N' Roses", y: 1987, spotify: "https://open.spotify.com/track/7o2CTH4ctstm8TNelqjb51" },
+  { id: "147", t: "Africa", a: "TOTO", y: 1982, spotify: "https://open.spotify.com/track/2374M0fQpWi3dLnB54qaLX" },
+  { id: "148", t: "Diário de um Detento", a: "Racionais MC's", y: 1997, spotify: "https://open.spotify.com/track/7wglwZzZoWUr8sOECwpu6L" },
+  { id: "149", t: "A Cor do Sol", a: "Cidade Negra", y: 1998, spotify: "https://open.spotify.com/track/16scTw9vzkxj0kIMNbTmeY" },
+  { id: "150", t: "Don't Speak", a: "No Doubt", y: 2003, spotify: "https://open.spotify.com/track/6JGQ98So2ik5GVI9ydQ2Yh" },
+  { id: "151", t: "In The Mood", a: "Glenn Miller", y: 2005, spotify: "https://open.spotify.com/track/5sj197xVLlMuwxgSCXYEkU" },
+  { id: "152", t: "My Heart Will Go On", a: "Céline Dion", y: 1997, spotify: "https://open.spotify.com/track/33LC84JgLvK2KuW43MfaNq" },
+  { id: "153", t: "Chega de Saudade", a: "Elizeth Cardoso", y: 1958, spotify: "https://open.spotify.com/track/57dsGvnWJyr3zx3zGNyrH8" },
+  { id: "154", t: "A QUEDA", a: "Gloria Groove", y: 2022, spotify: "https://open.spotify.com/track/3bk6sZAoYDNCdpIOfGM0pQ" },
+  { id: "155", t: "Energia de Gostosa", a: "Ivete Sangalo", y: 2024, spotify: "https://open.spotify.com/track/7nxo5gRHpcsIZy7n0mdCv7" },
+  { id: "156", t: "Balada", a: "Gusttavo Lima", y: 2011, spotify: "https://open.spotify.com/track/0zZnBbRW4Dt4cJKVtUQFwF" },
+  { id: "157", t: "Stressed Out", a: "Twenty One Pilots", y: 2015, spotify: "https://open.spotify.com/track/3CRDbSIZ4r5MsZ0YwxuEkn" },
+  { id: "158", t: "That Don't Impress Me Much", a: "Shania Twain", y: 1999, spotify: "https://open.spotify.com/track/4I7DV3MIgxJGlObiy9s6nx" },
+  { id: "159", t: "Imortal", a: "Sandy e Junior", y: 1999, spotify: "https://open.spotify.com/track/5b7F1UQeVZjEHS79hyapjJ" },
+  { id: "160", t: "Sweet Home Alabama", a: "Lynyrd Skynyrd", y: 1974, spotify: "https://open.spotify.com/track/7e89621JPkKaeDSTQ3avtg" },
+  { id: "161", t: "No Woman No Cry", a: "Bob Marley & The Wailers", y: 1974, spotify: "https://open.spotify.com/track/3PQLYVskjUeRmRIfECsL0X" },
+  { id: "162", t: "Señorita", a: "Shawn Mendes, Camila Cabello", y: 2019, spotify: "https://open.spotify.com/track/0TK2YIli7K1leLovkQiNik" },
+  { id: "163", t: "1979", a: "The Smashing Pumpkins", y: 2001, spotify: "https://open.spotify.com/track/3h5zik31hTTat9jmpCZZNC" },
+  { id: "164", t: "(I've Had) The Time of My Life", a: "Bill Medley, Jennifer Warnes", y: 2004, spotify: "https://open.spotify.com/track/4BFMQ15vXr626UOoZL8bUI" },
+  { id: "165", t: "Panis Et Circenses", a: "Os Mutantes", y: 1968, spotify: "https://open.spotify.com/track/0Dmnb3C3GaGdyjlyWaWLDr" },
+  { id: "166", t: "Have You Ever Seen The Rain", a: "Creedence Clearwater Revival", y: 1970, spotify: "https://open.spotify.com/track/2LawezPeJhN4AWuSB0GtAU" },
+  { id: "167", t: "If You Leave Me Now", a: "Chicago", y: 1976, spotify: "https://open.spotify.com/track/0KMGxYKeUzK9wc5DZCt3HT" },
+  { id: "168", t: "Sonífera ilha", a: "Titãs", y: 1984, spotify: "https://open.spotify.com/track/6uUORbJHSVvBoX6qp9cDda" },
+  { id: "169", t: "White Wedding", a: "Billy Idol", y: 2009, spotify: "https://open.spotify.com/track/1pydT12pGHLgfj3JLxWIUB" },
+  { id: "170", t: "Conga!", a: "Miami Sound Machine", y: 1985, spotify: "https://open.spotify.com/track/3FdHgoJbH3DXNtGLh56pFu" },
+  { id: "171", t: "I Got You Babe", a: "Sonny & Cher", y: 1965, spotify: "https://open.spotify.com/track/4SGBuq37Ol4HJr7pQqFMKa" },
+  { id: "172", t: "Do You Know? (The Ping Pong Song)", a: "Enrique Iglesias", y: 2007, spotify: "https://open.spotify.com/track/4MloswMM3eu7dHZ7MOzW3i" },
+  { id: "173", t: "I Wanna Dance with Somebody (Who Loves Me)", a: "Whitney Houston", y: 1987, spotify: "https://open.spotify.com/track/2tUBqZG2AbRi7Q0BIrVrEj" },
+  { id: "174", t: "What Is Love - 7\\ Mix", a: "Haddaway", y: 1993, spotify: "https://open.spotify.com/track/2IHaGyfxNoFPLJnaEg4GTs" },
+  { id: "175", t: "Set Fire to the Rain", a: "Adele", y: 2011, spotify: "https://open.spotify.com/track/3di5hcvxxciiqwMH1jarhY" },
+  { id: "176", t: "Valerie (feat. Amy Winehouse)", a: "Mark Ronson, Amy Winehouse, Baby J", y: 2008, spotify: "https://open.spotify.com/track/3RUFFtZcBCkOgoFLLzmrWz" },
+  { id: "177", t: "I Knew You Were Waiting (For Me)", a: "George Michael, Aretha Franklin", y: 1998, spotify: "https://open.spotify.com/track/2XgDgIsVUOt9Lov5G4Wruy" },
+  { id: "178", t: "Gita", a: "Raul Seixas", y: 1974, spotify: "https://open.spotify.com/track/4AtL1paTEV1AXUmj3c4GTI" },
+  { id: "179", t: "Whatcha Say", a: "Jason Derulo", y: 2010, spotify: "https://open.spotify.com/track/7xkQdy0cy5ymoWT7nedvLz" },
+  { id: "180", t: "You're So Vain", a: "Carly Simon", y: 1972, spotify: "https://open.spotify.com/track/2DnJjbjNTV9Nd5NOa1KGba" },
+  { id: "181", t: "Lola", a: "The Kinks", y: 1970, spotify: "https://open.spotify.com/track/0UAJH0k4k3slcE83a9UGCe" },
+  { id: "182", t: "Break My Heart", a: "Dua Lipa", y: 2020, spotify: "https://open.spotify.com/track/017PF4Q3l4DBUiWoXk4OWT" },
+  { id: "183", t: "Maracatu Atômico", a: "Chico Science, Nação Zumbi", y: 1996, spotify: "https://open.spotify.com/track/3cR6v2bOwqi7znC8P5Vs1T" },
+  { id: "184", t: "Fallin'", a: "Alicia Keys", y: 2001, spotify: "https://open.spotify.com/track/3unsLiH5FXmaDWtT5Imolu" },
+  { id: "185", t: "Royals", a: "Lorde", y: 2013, spotify: "https://open.spotify.com/track/4SDWMFvYJKtK1QPhIOeZhd" },
+  { id: "186", t: "Firework", a: "Katy Perry", y: 2010, spotify: "https://open.spotify.com/track/1mXuMM6zjPgjL4asbBsgnt" },
+  { id: "187", t: "Me Abraça", a: "Banda Eva", y: 1995, spotify: "https://open.spotify.com/track/63lNKw8FiWJG5xsXYeMaY4" },
+  { id: "188", t: "We Belong Together", a: "Mariah Carey", y: 2005, spotify: "https://open.spotify.com/track/4EI8VuxUuIHKfafU72emqz" },
+  { id: "189", t: "Camaro Amarelo", a: "Munhoz & Mariano", y: 2012, spotify: "https://open.spotify.com/track/5ivya8USJX3ezDjd2FYSXa" },
+  { id: "190", t: "The Look", a: "Roxette", y: 1988, spotify: "https://open.spotify.com/track/2oWMI54r0qT4N8Xb4C76vq" },
+  { id: "191", t: "Fast Car", a: "Tracy Chapman", y: 1988, spotify: "https://open.spotify.com/track/2M9ro2krNb7nr7HSprkEgo" },
+  { id: "192", t: "Where Is The Love?", a: "Black Eyed Peas", y: 2003, spotify: "https://open.spotify.com/track/0xmjwnQ3FNE6HuWCt2nHdZ" },
+  { id: "193", t: "I Want It That Way", a: "Backstreet Boys", y: 1999, spotify: "https://open.spotify.com/track/47BBI51FKFwOMlIiX6m8ya" },
+  { id: "194", t: "Ring of Fire", a: "Johnny Cash", y: 1963, spotify: "https://open.spotify.com/track/6YffUZJ2R06kyxyK6onezL" },
+  { id: "195", t: "I Like To Move It", a: "Reel 2 Real, The Mad Stuntman, Erick Morillo", y: 1994, spotify: "https://open.spotify.com/track/6dHTkQYY3zdR9i9Nj0IGVW" },
+  { id: "196", t: "Bem Que Se Quis", a: "Marisa Monte", y: 1989, spotify: "https://open.spotify.com/track/6tAug9ksGLZb2z1RfPZJMo" },
+  { id: "197", t: "Somebody That I Used to Know", a: "Gotye, Kimbra", y: 2011, spotify: "https://open.spotify.com/track/62oaDoBveZxvZb94ziiMXi" },
+  { id: "198", t: "Blurred Lines", a: "Robin Thicke, T.I., Pharrell Williams", y: 2020, spotify: "https://open.spotify.com/track/2pgbGOb00WrlXY3ZRFKn7v" },
+  { id: "199", t: "How You Remind Me", a: "Nickelback", y: 2001, spotify: "https://open.spotify.com/track/0gmbgwZ8iqyMPmXefof8Yf" },
+  { id: "200", t: "We R Who We R", a: "Kesha", y: 2010, spotify: "https://open.spotify.com/track/3LUWWox8YYykohBbHUrrxd" },
+  { id: "201", t: "Oops!...I Did It Again", a: "Britney Spears", y: 2000, spotify: "https://open.spotify.com/track/6naxalmIoLFWR0siv8dnQQ" },
+  { id: "202", t: "Counting Stars", a: "OneRepublic", y: 2013, spotify: "https://open.spotify.com/track/2tpWsVSb9UEmDRxAl1zhX1" },
+  { id: "203", t: "Super Freak", a: "Rick James", y: 1981, spotify: "https://open.spotify.com/track/2dCmGcEOQrMQhMMS8Vj7Ca" },
+  { id: "204", t: "Tequila", a: "The Champs", y: 1994, spotify: "https://open.spotify.com/track/5gJKsGij5oGt5H5RSFYXPa" },
+  { id: "205", t: "Mr. Vain", a: "Culture Beat", y: 1993, spotify: "https://open.spotify.com/track/2rTYgHxgcndkUrRoU7x0Sv" },
+  { id: "206", t: "Fio De Cabelo", a: "Chitãozinho & Xororó", y: 1982, spotify: "https://open.spotify.com/track/3peAMPXkq30Ggdyd9JhJY8" },
+  { id: "207", t: "Cheguei", a: "LUDMILLA", y: 2016, spotify: "https://open.spotify.com/track/6cbZb9mVAc5s8HtwklLoI0" },
+  { id: "208", t: "Só Pra Contrariar", a: "Grupo Fundo De Quintal", y: 1986, spotify: "https://open.spotify.com/track/7v7J6S6Ms6aewGQMdg0b26" },
+  { id: "209", t: "Dancing In the Dark", a: "Bruce Springsteen", y: 1984, spotify: "https://open.spotify.com/track/7FwBtcecmlpc1sLySPXeGE" },
+  { id: "210", t: "Lean On", a: "Major Lazer, DJ Snake, MØ", y: 2015, spotify: "https://open.spotify.com/track/2YWjW3wwQIBLNhxWKBQd16" },
+  { id: "211", t: "(What A) Wonderful World", a: "Sam Cooke", y: 1960, spotify: "https://open.spotify.com/track/2G0GextMwZJLkNxcSZ7ZJ3" },
+  { id: "212", t: "Waterfalls", a: "TLC", y: 1994, spotify: "https://open.spotify.com/track/6qspW4YKycviDFjHBOaqUY" },
+  { id: "213", t: "Wonderwall", a: "Oasis", y: 1995, spotify: "https://open.spotify.com/track/1qPbGZqppFwLwcBC1JQ6Vr" },
+  { id: "214", t: "Be Bop a Lula", a: "Gene Vincent", y: 2007, spotify: "https://open.spotify.com/track/1QUQkPdroMjVD4FeEQ1c3U" },
+  { id: "215", t: "Everybody Hurts", a: "R.E.M.", y: 1992, spotify: "https://open.spotify.com/track/6PypGyiu0Y2lCDBN1XZEnP" },
+  { id: "216", t: "Nothing Compares 2 U", a: "Sinéad O'Connor", y: 1990, spotify: "https://open.spotify.com/track/3nvuPQTw2zuFAVuLsC9IYQ" },
+  { id: "217", t: "Barbie Girl", a: "Aqua", y: 1997, spotify: "https://open.spotify.com/track/5ZrDlcxIDZyjOzHdYW1ydr" },
+  { id: "218", t: "You're Beautiful", a: "James Blunt", y: 2005, spotify: "https://open.spotify.com/track/0vg4WnUWvze6pBOJDTq99k" },
+  { id: "219", t: "It's My Life", a: "Bon Jovi", y: 2010, spotify: "https://open.spotify.com/track/6iNBM60VQtPUUhkKfwa5KV" },
+  { id: "220", t: "Walk Of Life", a: "Dire Straits", y: 1985, spotify: "https://open.spotify.com/track/6HMFtoMvv6n6Q2eOyPFyne" },
+  { id: "221", t: "Educação sentimental II", a: "Kid Abelha", y: 1985, spotify: "https://open.spotify.com/track/196ZNihAwp7y7Ao4YfSdIx" },
+  { id: "222", t: "Cotton Eye Joe", a: "Rednex", y: 1994, spotify: "https://open.spotify.com/track/06hsdMbBxWGqBO0TV0Zrkf" },
+  { id: "223", t: "Zombie", a: "The Cranberries", y: 1994, spotify: "https://open.spotify.com/track/7EZC6E7UjZe63f1jRmkWxt" },
+  { id: "224", t: "Jolene", a: "Dolly Parton", y: 1974, spotify: "https://open.spotify.com/track/2SpEHTbUuebeLkgs9QB7Ue" },
+  { id: "225", t: "Karma Chameleon", a: "Culture Club", y: 1983, spotify: "https://open.spotify.com/track/3XDeeP9wBZzGhIPZmLfEEx" },
+  { id: "226", t: "Tchau e Bença - Live From Brazil", a: "Exaltasamba", y: 2007, spotify: "https://open.spotify.com/track/1oXFfHuBuasMQ9lnPSRvGU" },
+  { id: "227", t: "Parei na Contra Mão", a: "Roberto Carlos", y: 1963, spotify: "https://open.spotify.com/track/3ba9RxGFulqON6ACuPqDvw" },
+  { id: "228", t: "Smells Like Teen Spirit", a: "Nirvana", y: 1991, spotify: "https://open.spotify.com/track/4CeeEOM32jQcH3eN9Q2dGj" },
+  { id: "229", t: "Praise You", a: "Fatboy Slim", y: 1998, spotify: "https://open.spotify.com/track/10yY7i70r9wtllofw0GIpx" },
+  { id: "230", t: "Codinome Beija-Flor", a: "Cazuza", y: 1985, spotify: "https://open.spotify.com/track/5yFI0Vs3x4EbeIDerT0ck1" },
+  { id: "231", t: "Surfin' U.S.A. (Mono)", a: "The Beach Boys", y: 1963, spotify: "https://open.spotify.com/track/2dbaIpJoAk2hhrrX2ljKJo" },
+  { id: "232", t: "Price Tag", a: "Jessie J, B.o.B", y: 2011, spotify: "https://open.spotify.com/track/2fTsFCKRFQ5M0igJgabnLA" },
+  { id: "233", t: "A Volta do Boêmio", a: "Nelson Gonçalves", y: 1960, spotify: "https://open.spotify.com/track/67LQpgGMjI0jnXo9lRj07C" },
+  { id: "234", t: "Tears in Heaven", a: "Eric Clapton", y: 1999, spotify: "https://open.spotify.com/track/7utRJ4BeYx85khzP3lKoBX" },
+  { id: "235", t: "Rehab", a: "Amy Winehouse", y: 2006, spotify: "https://open.spotify.com/track/3N4DI1vuTSX1tz7fa2NQZw" },
+  { id: "236", t: "Mania De Você", a: "Rita Lee, Roberto De Carvalho", y: 1979, spotify: "https://open.spotify.com/track/6owwZC8gUvrBuygvOHaYXb" },
+  { id: "237", t: "Genie In a Bottle", a: "Christina Aguilera", y: 1999, spotify: "https://open.spotify.com/track/11mwFrKvLXCbcVGNxffGyP" },
+  { id: "238", t: "Le Freak", a: "CHIC", y: 1978, spotify: "https://open.spotify.com/track/7Kszjzps0xbQXyo1pO4KfE" },
+  { id: "239", t: "Dancin' Days", a: "Frenéticas", y: 1978, spotify: "https://open.spotify.com/track/3JYSTqNZesQYJGLo7oMc6q" },
+  { id: "240", t: "Foi Um Rio Que Passou Em Minha Vida", a: "Paulinho Da Viola", y: 1970, spotify: "https://open.spotify.com/track/4R3KThu3ex03ri8KJYsvdz" },
+  { id: "241", t: "Pelados Em Santos", a: "Mamonas Assassinas", y: 1995, spotify: "https://open.spotify.com/track/2iJpjciYl8vfQbb543b5Pb" },
+  { id: "242", t: "Respeita Januário", a: "Luiz Gonzaga", y: 1962, spotify: "https://open.spotify.com/track/1oyO7BZS5PJL5M6u74d7hY" },
+  { id: "243", t: "Belfast Child", a: "Simple Minds", y: 1989, spotify: "https://open.spotify.com/track/3fKDSSIgOngs8YYzFJO6eD" },
+  { id: "244", t: "Lonely", a: "Akon", y: 2005, spotify: "https://open.spotify.com/track/4v7DCN09hgXkKazefkznDQ" },
+  { id: "245", t: "Don't Stop Believin'", a: "Journey", y: 1981, spotify: "https://open.spotify.com/track/4bHsxqR3GMrXTxEPLuK5ue" },
+  { id: "246", t: "One More Time", a: "Daft Punk", y: 2000, spotify: "https://open.spotify.com/track/2Uy6EhQXAYkXA6MohPgjpV" },
+  { id: "247", t: "I've Got a Woman", a: "Ray Charles", y: 1994, spotify: "https://open.spotify.com/track/4qKlYv1B1XhJ7Q114Thv6m" },
+  { id: "248", t: "Equalize", a: "Pitty", y: 2003, spotify: "https://open.spotify.com/track/2iUxWUv5TovjBmayOcWohB" },
+  { id: "249", t: "drivers license", a: "Olivia Rodrigo", y: 2021, spotify: "https://open.spotify.com/track/5wANPM4fQCJwkGd4rN57mH" },
+  { id: "250", t: "The Twist", a: "Chubby Checker", y: 1962, spotify: "https://open.spotify.com/track/6DSvUZQdqtNfkJI4cAiUsM" },
+  { id: "251", t: "MMMBop", a: "Hanson", y: 2006, spotify: "https://open.spotify.com/track/2HNZxbvFvasRtlOJ9M6DgR" },
+  { id: "252", t: "Holding Back the Years", a: "Simply Red", y: 1985, spotify: "https://open.spotify.com/track/1yg7fwwYmx9DQ2TdXUmfpJ" },
+  { id: "253", t: "O que sobrou do céu", a: "O Rappa", y: 1999, spotify: "https://open.spotify.com/track/1A47ISHc08cBeIA3hifQXn" },
+  { id: "254", t: "Severina Xique Xique", a: "Genival Lacerda", y: 1984, spotify: "https://open.spotify.com/track/1vcHEaIrbnQQQ62JhgBMs7" },
+  { id: "255", t: "CAJU", a: "Liniker", y: 2024, spotify: "https://open.spotify.com/track/7tmvvRmUqzCRjRx9ub8K7i" },
+  { id: "256", t: "Dynamite", a: "BTS", y: 2020, spotify: "https://open.spotify.com/track/5QDLhrAOJJdNAmCTJ8xMyW" },
+  { id: "257", t: "A Banda", a: "Chico Buarque", y: 1966, spotify: "https://open.spotify.com/track/6wUp7y502iyWLuLuurlOyw" },
+  { id: "258", t: "La Belle De Jour", a: "Alceu Valença", y: 1992, spotify: "https://open.spotify.com/track/7CdDIvw3jvjNaIs5m3mM4A" },
+  { id: "259", t: "K.O.", a: "Pabllo Vittar", y: 2017, spotify: "https://open.spotify.com/track/5zSiXA70xM4kuSt6qim6jl" },
+  { id: "260", t: "Upside Down", a: "Diana Ross", y: 1980, spotify: "https://open.spotify.com/track/3pbtBomO4Zt5gGiqsYeiBH" },
+  { id: "261", t: "Numb / Encore", a: "JA-Z, Linkin Park", y: 2004, spotify: "https://open.spotify.com/track/5sNESr6pQfIhL3krM8CtZn" },
+  { id: "262", t: "O Bom", a: "Eduardo Araujo, The Fevers", y: 1995, spotify: "https://open.spotify.com/track/7aLh3kqOguvlZQdBioa5cP" },
+  { id: "263", t: "Conceição", a: "Cauby Peixoto", y: 1956, spotify: "https://open.spotify.com/track/4RKCYsB4cgP3yL5p4UT4CB" },
+  { id: "264", t: "Não aprendi a dizer adeus", a: "Leandro & Leonardo, Continental", y: 1991, spotify: "https://open.spotify.com/track/0CH2chgUAAN0hgegCDhrYo" },
+  { id: "265", t: "Fly Away", a: "Lenny Kravitz", y: 1998, spotify: "https://open.spotify.com/track/1OxcIUqVmVYxT6427tbhDW" },
+  { id: "266", t: "Give It Up", a: "KC & The Sunshine Band", y: 1983, spotify: "https://open.spotify.com/track/6yoa7L6BlqYqBHlLL96j6k" },
+  { id: "267", t: "Musa Do Verão", a: "Felipe Dylon", y: 2003, spotify: "https://open.spotify.com/track/693kM2e0VGAe0pkqtcdrAu" },
+  { id: "268", t: "Rap É Compromisso", a: "Sabotage, Negra Li", y: 2014, spotify: "https://open.spotify.com/track/4WZfgKQ9WGPsa25rHVrL3x" },
+  { id: "269", t: "Dance Monkey", a: "Tones And I", y: 2019, spotify: "https://open.spotify.com/track/5ZULALImTm80tzUbYQYM9d" },
+  { id: "270", t: "My Guy", a: "Mary Wells", y: 1964, spotify: "https://open.spotify.com/track/4591VqUIXysNlmI5NcAIUd" },
+  { id: "271", t: "Mr. Tambourine Man", a: "The Byrds", y: 1965, spotify: "https://open.spotify.com/track/2HCaIYjkvWSZzaSKUoOh3d" },
+  { id: "272", t: "Hung Up", a: "Madonna", y: 2005, spotify: "https://open.spotify.com/track/3850dYVgOFIXJh5U4BFEWH" },
+  { id: "273", t: "We Are Family", a: "Sister Sledge", y: 1995, spotify: "https://open.spotify.com/track/5IKLwqBQG6KU6MP2zP80Nu" },
+  { id: "274", t: "Your Song", a: "Elton John", y: 1970, spotify: "https://open.spotify.com/track/7gCeodIXjhCLDWC5H1LOmT" },
+  { id: "275", t: "Gatinha Manhosa", a: "Erasmo Carlos", y: 1966, spotify: "https://open.spotify.com/track/2yxkFrtoVuYU58Fya583hI" },
+  { id: "276", t: "Meu Mundo E Nada Mais", a: "Guilherme Arantes", y: 1976, spotify: "https://open.spotify.com/track/45R8exHTqbUxB9cgHAAnLk" },
+  { id: "277", t: "Não Quero Dinheiro (Só Quero Amar)", a: "Tim Maia", y: 1971, spotify: "https://open.spotify.com/track/0SfcG65T1KKCj5NQffpzQR" },
+  { id: "278", t: "In Da Club", a: "50 Cent", y: 2003, spotify: "https://open.spotify.com/track/7iL6o9tox1zgHpKUfh9vuC" },
+  { id: "279", t: "That's Amore", a: "Dean Martin", y: 2009, spotify: "https://open.spotify.com/track/6GYqOflskcZxPj8rkTZkOy" },
+  { id: "280", t: "American Pie", a: "Don McLean", y: 1971, spotify: "https://open.spotify.com/track/1fDsrQ23eTAVFElUMaf38X" },
+  { id: "281", t: "Life on Mars?", a: "David Bowie", y: 2002, spotify: "https://open.spotify.com/track/7MpQOaVorMfoNHOJ80YxhY" },
+  { id: "282", t: "Get Back", a: "The Beatles", y: 1970, spotify: "https://open.spotify.com/track/4MLBqAEzNN89o2M9h92Z26" },
+  { id: "283", t: "Zona De Perigo", a: "Léo Santana", y: 2023, spotify: "https://open.spotify.com/track/3ETkpLgtTvZcPZ9eTe4koB" },
+  { id: "284", t: "Work", a: "Rihanna, Drake", y: 2016, spotify: "https://open.spotify.com/track/72TFWvU3wUYdUuxejTTIzt" },
+  { id: "285", t: "With A Little Help From My Friends", a: "Joe Cocker", y: 1969, spotify: "https://open.spotify.com/track/0YZ3J8xzGwLOg4yEgST1YK" },
+  { id: "286", t: "The Lazy Song", a: "Bruno Mars", y: 2010, spotify: "https://open.spotify.com/track/386RUes7n1uM1yfzgeUuwp" },
+  { id: "287", t: "You Sexy Thing", a: "Hot Chocolate", y: 2007, spotify: "https://open.spotify.com/track/3jAG0kb7gg0vGeFFZj6bBt" },
+  { id: "288", t: "Tremendo Vacilão", a: "Perlla", y: 2006, spotify: "https://open.spotify.com/track/480o64VmNvWcwzCg74VUxW" },
+  { id: "289", t: "Uma Barata Chamada Kafka", a: "Inimigos Do Rei", y: 1989, spotify: "https://open.spotify.com/track/6ukVq78jt839V2poGyeacE" },
+  { id: "290", t: "I Love Rock N Roll", a: "The Arrows", y: 2006, spotify: "https://open.spotify.com/track/4zGBAwjlJ0TP02mHH8Wpmo" },
+  { id: "291", t: "Anyone", a: "Justin Bieber", y: 2021, spotify: "https://open.spotify.com/track/2WnAKZefdRHxtBEkRjFOHC" },
+  { id: "292", t: "Shallow", a: "Lady Gaga, Bradley Cooper", y: 2018, spotify: "https://open.spotify.com/track/6QfS2wq5sSC1xAJCQsTSlj" },
+  { id: "293", t: "Someone You Loved", a: "Lewis Capaldi", y: 2018, spotify: "https://open.spotify.com/track/2TIlqbIneP0ZY1O0EzYLlc" },
+  { id: "294", t: "Poker Face", a: "Lady Gaga", y: 2008, spotify: "https://open.spotify.com/track/5R8dQOPq8haW94K7mgERlO" },
+  { id: "295", t: "Waka Waka (This Time for Africa)", a: "Shakira, Freshlyground", y: 2010, spotify: "https://open.spotify.com/track/2Cd9iWfcOpGDHLz6tVA3G4" },
+  { id: "296", t: "Twist And Shout", a: "The Isley Brothers", y: 2005, spotify: "https://open.spotify.com/track/7iFdUmdqT9XrsJdSGf9KrX" },
+  { id: "297", t: "Yeah! (feat. Lil Jon & Ludacris)", a: "USHER, Lil Jon, Ludacris", y: 2004, spotify: "https://open.spotify.com/track/5rb9QrpfcKFHM1EUbSIurX" },
+  { id: "298", t: "White Room", a: "Cream", y: 1968, spotify: "https://open.spotify.com/track/3Xls4cNOwy01dtrNXb1inG" },
+  { id: "299", t: "O Sol Nascerá (A Sorrir)", a: "Cartola", y: 1974, spotify: "https://open.spotify.com/track/6nJRiVDYAM6qCWhdLeQTMd" },
+  { id: "300", t: "Anna Júlia", a: "Los Hermanos", y: 1999, spotify: "https://open.spotify.com/track/0aASUtDb1N96NJDwmWj5Gf" },
+  { id: "301", t: "Paradise By the Dashboard Light", a: "Meat Loaf", y: 1977, spotify: "https://open.spotify.com/track/2g7gviEeJr6pyxO7G35EWQ" },
+  { id: "302", t: "I Like It", a: "Cardi B, Bad Bunny, J Balvin", y: 2018, spotify: "https://open.spotify.com/track/58q2HKrzhC3ozto2nDdN4z" },
+  { id: "303", t: "La Bamba", a: "Ritchie Valens", y: 1959, spotify: "https://open.spotify.com/track/2aEeghgUgcu75tzcolFMfs" },
+  { id: "304", t: "O vira", a: "Secos & Molhados", y: 1973, spotify: "https://open.spotify.com/track/399JDPgES4MtqnPrmzWDrg" },
+  { id: "305", t: "Light My Fire", a: "The Doors", y: 1967, spotify: "https://open.spotify.com/track/5uvosCdMlFdTXhoazkTI5R" },
+  { id: "306", t: "Let It Be", a: "The Beatles", y: 1970, spotify: "https://open.spotify.com/track/7iN1s7xHE4ifF5povM6A48" },
+  { id: "307", t: "When a Man Loves a Woman", a: "Percy Sledge", y: 1966, spotify: "https://open.spotify.com/track/2mTiKaGdMPA4wfOGGUroE5" },
+  { id: "308", t: "Barbra Streisand (Radio Edit)", a: "Duck Sauce", y: 2010, spotify: "https://open.spotify.com/track/5pYlc1vQ6999WU43WzF4SR" }
+];
 
 /* ── Genre → accent colour ────────────────────────────── */
 var GC = {
@@ -407,7 +711,13 @@ var PGRADS = [
   ["#7C3AED","#5548F0"],
   ["#0891B2","#0E7490"],
   ["#059669","#047857"],
-  ["#DC2626","#991B1B"]
+  ["#DC2626","#991B1B"],
+  ["#D97706","#B45309"],
+  ["#7C3AED","#A855F7"],
+  ["#0891B2","#38BDF8"],
+  ["#059669","#34D399"],
+  ["#BE185D","#9D174D"],
+  ["#1D4ED8","#1E40AF"]
 ];
 
 /* ══════════════════════════════════════════════════════
@@ -416,7 +726,7 @@ var PGRADS = [
 ══════════════════════════════════════════════════════ */
 var S = {
   pc: 2,
-  pnames: ["Jogador 1", "Jogador 2", "Jogador 3", "Jogador 4"],
+  pnames: ["Jogador 1","Jogador 2","Jogador 3","Jogador 4","Jogador 5","Jogador 6","Jogador 7","Jogador 8","Jogador 9","Jogador 10"],
   players: [],   // {name, tl:[{s:song}], score, ca, cb}
   idx: 0,
   deck: [],
@@ -433,11 +743,8 @@ renderNames();
 
 function setPC(n) {
   S.pc = n;
-  var btns = document.querySelectorAll(".cnt-btn");
-  for (var i = 0; i < btns.length; i++) {
-    if (i + 1 === n) btns[i].classList.add("on");
-    else btns[i].classList.remove("on");
-  }
+  var sel = document.getElementById("player-count-select");
+  if (sel && parseInt(sel.value) !== n) sel.value = String(n);
   renderNames();
 }
 
@@ -574,16 +881,12 @@ function renderFront(song) {
   document.getElementById("cg-stripe").style.background = col + "18";
   document.getElementById("ctitle").textContent = song.t;
   document.getElementById("cartist").textContent = song.a;
-  document.getElementById("flip-hint").textContent = "toque para ouvir 🎧";
+  document.getElementById("flip-hint").textContent = "toque para ouvir \uD83C\uDFA7";
+  var badge = document.getElementById("spotify-badge");
+  if (badge) badge.style.display = (song && song.spotify) ? "inline-flex" : "none";
   var prompt = document.getElementById("cprompt");
   prompt.textContent = "Escolha uma posição na linha do tempo \u2193";
   prompt.className = "card-prompt";
-
-  // Show/hide Spotify badge
-  var badge = document.getElementById("spotify-badge");
-  if (badge) {
-    badge.style.display = (song && song.spotify) ? "inline-flex" : "none";
-  }
 }
 
 function resetBack(song) {
@@ -733,44 +1036,37 @@ function updateConf() {
    CARD CLICK + FLIP
 ══════════════════════════════════════════════════════ */
 function onCardClick() {
-  // No position chosen → open Spotify for this card
+  // No position selected yet → open Spotify
   if (S.phase === "playing" && S.pos === null) {
     openSpotify();
     return;
   }
-  // Position chosen → flip the card
+  // Position selected → flip
   if (S.phase !== "playing") return;
   doFlip();
 }
 
 function openSpotify() {
   if (!S.card) return;
-
-  // Validate URL
   var url = (S.card.spotify || "").trim();
   if (!url || !url.includes("/track/")) {
     showToast("Música indisponível 😢");
     return;
   }
-
-  // Press animation via transform (does NOT use classList to avoid CSS conflict)
+  // Press animation
   var card = document.getElementById("main-card");
   if (card) {
     card.style.transition = "transform 0.12s cubic-bezier(.36,.07,.19,.97)";
     card.style.transform  = "scale(0.94)";
-    setTimeout(function () {
-      card.style.transform = "";
-      setTimeout(function () {
-        card.style.transition = "";
-      }, 150);
+    setTimeout(function() {
+      card.style.transform  = "";
+      setTimeout(function() { card.style.transition = ""; }, 150);
     }, 120);
   }
-
-  // Open Spotify after press animation (delay ensures mobile Safari handles it)
-  setTimeout(function () {
-    window.open(url, "_blank");
-  }, 140);
+  // Open Spotify (delay for mobile Safari)
+  setTimeout(function() { window.open(url, "_blank"); }, 140);
 }
+
 function flipCard() {
   if (S.phase !== "playing") return;
   if (S.pos === null) {
