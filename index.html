@@ -94,7 +94,7 @@ body::before{
 
 /* Card */
 .card-stage{display:flex;flex-direction:column;align-items:center;gap:12px}
-.card-wrap{width:148px;height:196px;perspective:1200px;cursor:pointer;position:relative}
+.card-wrap{width:172px;height:210px;perspective:1200px;cursor:pointer;position:relative}
 .card-inner{width:100%;height:100%;position:relative;transform-style:preserve-3d;transition:transform .55s cubic-bezier(.4,0,.2,1)}
 .card-wrap.flipped .card-inner{transform:rotateY(180deg)}
 .cface{position:absolute;inset:0;border-radius:18px;backface-visibility:hidden;-webkit-backface-visibility:hidden;overflow:hidden}
@@ -217,6 +217,33 @@ body::before{
 select.name-inp { color: var(--t0); background-color: var(--bg2); }
 select.name-inp option { background: var(--bg2); color: var(--t0); }
 .ptab { min-width: 58px !important; }
+
+/* ── Player-colored won cards ── */
+.tlc.player-card .tlc-in {
+  border: 2px solid rgba(255,255,255,.18) !important;
+}
+/* ── Difficulty: hide title / artist ── */
+.diff-hide { opacity: 0 !important; pointer-events: none !important; }
+.diff-placeholder { font-size: 11px; color: rgba(255,255,255,.25); letter-spacing:.15em; text-transform:uppercase; }
+/* ── Tiebreaker banner ── */
+.tie-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: linear-gradient(135deg, #F59E0B, #D97706);
+  border-radius: var(--rf); padding: 5px 16px;
+  font-family: var(--fh); font-size: 12px; font-weight: 700;
+  color: #000; letter-spacing: .04em;
+  box-shadow: 0 2px 10px rgba(245,158,11,.4);
+  animation: tieGlow 1.2s ease-in-out infinite;
+}
+@keyframes tieGlow {
+  0%,100% { box-shadow: 0 2px 10px rgba(245,158,11,.4); }
+  50%      { box-shadow: 0 2px 22px rgba(245,158,11,.75); }
+}
+/* ── Medals for more than 4 players ── */
+.srow-med { min-width: 28px; }
+/* ── Rounds select ── */
+.setup-row-2 { display: flex; gap: 12px; }
+.setup-row-2 > div { flex: 1; }
 </style>
 </head>
 <body>
@@ -244,6 +271,26 @@ select.name-inp option { background: var(--bg2); color: var(--t0); }
       </select>
     </div>
     <div class="divider" style="margin:16px 0"></div>
+    <div class="setup-row-2">
+      <div>
+        <div class="eyebrow" style="margin-bottom:8px">Rodadas para Vencer</div>
+        <select id="rounds-select" class="name-inp" style="width:100%;font-family:var(--fh);font-size:16px;font-weight:700;padding:11px 14px;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%228%22 viewBox=%220 0 12 8%22><path d=%22M1 1l5 5 5-5%22 stroke=%22%23A0A0CC%22 stroke-width=%221.8%22 fill=%22none%22 stroke-linecap=%22round%22/></svg>');background-repeat:no-repeat;background-position:right 12px center" onchange="S.maxScore=parseInt(this.value)">
+          <option value="5">5 pontos</option>
+          <option value="10" selected>10 pontos</option>
+          <option value="15">15 pontos</option>
+          <option value="20">20 pontos</option>
+        </select>
+      </div>
+      <div>
+        <div class="eyebrow" style="margin-bottom:8px">Dificuldade</div>
+        <select id="diff-select" class="name-inp" style="width:100%;font-family:var(--fh);font-size:16px;font-weight:700;padding:11px 14px;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%228%22 viewBox=%220 0 12 8%22><path d=%22M1 1l5 5 5-5%22 stroke=%22%23A0A0CC%22 stroke-width=%221.8%22 fill=%22none%22 stroke-linecap=%22round%22/></svg>');background-repeat:no-repeat;background-position:right 12px center" onchange="S.difficulty=this.value">
+          <option value="iniciante" selected>🟢 Iniciante</option>
+          <option value="intermediario">🟡 Intermediário</option>
+          <option value="avancado">🔴 Avançado</option>
+        </select>
+      </div>
+    </div>
+    <div class="divider" style="margin:16px 0"></div>
     <div class="eyebrow">Nomes dos Jogadores</div>
     <div class="names-grid" id="names-grid"></div>
     <div class="divider" style="margin:16px 0"></div>
@@ -266,7 +313,10 @@ select.name-inp option { background: var(--bg2); color: var(--t0); }
   </div>
   <div class="pbar" id="pbar"></div>
   <div class="gbody">
-    <div class="turn-lbl"><div class="turn-badge" id="turn-badge">—</div></div>
+    <div class="turn-lbl">
+        <div class="turn-badge" id="turn-badge">—</div>
+        <div id="tie-badge" class="tie-badge" style="display:none">⚡ DESEMPATE</div>
+      </div>
     <div class="card-stage">
       <div class="card-wrap" id="main-card" onclick="onCardClick()">
         <div class="card-inner" id="card-inner">
@@ -733,7 +783,11 @@ var S = {
   card: null,
   pos: null,     // chosen insertion index
   phase: "setup",
-  lastOk: null
+  lastOk: null,
+  maxScore: 10,       // set from rounds-select
+  difficulty: "iniciante", // "iniciante"|"intermediario"|"avancado"
+  tiebreaker: false,  // true when multiple players hit maxScore same round
+  tiePlayers: []      // indices of players in tiebreaker
 };
 
 /* ══════════════════════════════════════════════════════
@@ -779,34 +833,46 @@ function renderNames() {
 }
 
 function startGame() {
-  // Collect names from inputs
+  // Read names
   for (var i = 0; i < S.pc; i++) {
     var inp = document.getElementById("ni-" + i);
     S.pnames[i] = (inp && inp.value.trim()) ? inp.value.trim() : "Jogador " + (i + 1);
   }
 
+  // Read rounds + difficulty from selects
+  var rs = document.getElementById("rounds-select");
+  S.maxScore = rs ? parseInt(rs.value) : 10;
+  var ds = document.getElementById("diff-select");
+  S.difficulty = ds ? ds.value : "iniciante";
+
   // Shuffle deck
   var deck = shuffle(DB.slice());
 
-  // Build players — each gets 1 seed card already placed
-  S.players = [];
+  // Build players array
+  var players = [];
   for (var i = 0; i < S.pc; i++) {
     var seed = deck.shift();
-    S.players.push({
+    players.push({
       name: S.pnames[i],
-      tl: [{ s: seed }],
+      tl: [{ s: seed, playerColor: [PGRADS[i][0], PGRADS[i][1]] }],
       score: 1,
       ca: PGRADS[i][0],
       cb: PGRADS[i][1]
     });
   }
 
+  // ── Feature: Randomize player order ──────────────────────────
+  players = shuffle(players);
+
+  S.players = players;
   S.deck = deck;
   S.idx = 0;
   S.card = S.deck.shift();
   S.pos = null;
   S.phase = "playing";
   S.lastOk = null;
+  S.tiebreaker = false;
+  S.tiePlayers = [];
 
   showScreen("game");
   renderGame();
@@ -834,6 +900,7 @@ function renderGame() {
 
   // Render front face content
   renderFront(S.card);
+  applyDifficulty();
 
   // Reset back face to genre colour (NOT result colour)
   resetBack(S.card);
@@ -847,6 +914,13 @@ function renderGame() {
 
   // Render other players
   renderOthers();
+
+  // Show/hide tiebreaker badge
+  var tieBadge = document.getElementById("tie-badge");
+  if (tieBadge) tieBadge.style.display = S.tiebreaker ? "inline-flex" : "none";
+
+  // Update score display (/maxScore)
+  document.getElementById("turn-badge").textContent = "Vez de " + S.players[S.idx].name;
 
   // Scroll game body to top
   var gb = document.querySelector(".gbody");
@@ -889,6 +963,31 @@ function renderFront(song) {
   prompt.className = "card-prompt";
 }
 
+function applyDifficulty() {
+  var d = S.difficulty || "iniciante";
+  var titleEl  = document.getElementById("ctitle");
+  var artistEl = document.getElementById("cartist");
+  var hintEl   = document.getElementById("flip-hint");
+
+  if (d === "iniciante") {
+    // Show everything
+    if (titleEl)  { titleEl.style.visibility  = ""; titleEl.innerHTML  = esc(S.card ? S.card.t : ""); }
+    if (artistEl) { artistEl.style.visibility = ""; artistEl.innerHTML = esc(S.card ? S.card.a : ""); }
+    if (hintEl) hintEl.textContent = "toque para ouvir \uD83C\uDFA7";
+  } else if (d === "intermediario") {
+    // Show title, hide artist
+    if (titleEl)  { titleEl.style.visibility  = ""; titleEl.innerHTML  = esc(S.card ? S.card.t : ""); }
+    if (artistEl) { artistEl.style.visibility = "hidden"; artistEl.textContent = ""; }
+    if (hintEl) hintEl.textContent = "toque para ouvir \uD83C\uDFA7";
+  } else {
+    // avancado: hide both, only Spotify interaction
+    if (titleEl)  { titleEl.style.visibility  = "hidden"; titleEl.textContent = ""; }
+    if (artistEl) { artistEl.style.visibility = "hidden"; artistEl.textContent = ""; }
+    if (hintEl) hintEl.textContent = "toque para ouvir \uD83C\uDFA7";
+  }
+}
+
+
 function resetBack(song) {
   /* IMPORTANT: only set background/border — NEVER overwrite transform here.
      The CSS class .cback already applies transform:rotateY(180deg).
@@ -927,13 +1026,24 @@ function renderTL() {
 }
 
 function makeTLC(entry) {
-  var col = gc(entry.s.g);
+  var genreCol = gc(entry.s.g);
   var d = document.createElement("div");
-  d.className = "tlc";
+  d.className = "tlc" + (entry.playerColor ? " player-card" : "");
+
+  // Player-won cards get a subtle player-color overlay
+  var bgStyle;
+  if (entry.playerColor) {
+    var ca = entry.playerColor[0];
+    var cb = entry.playerColor[1];
+    bgStyle = 'background:linear-gradient(145deg,' + ca + '44,' + cb + '22)';
+  } else {
+    bgStyle = 'background:linear-gradient(145deg,' + genreCol + '33,' + genreCol + '16)';
+  }
+
   d.innerHTML =
-    '<div class="tlc-in" style="background:linear-gradient(145deg,' + col + '33,' + col + '16)">' +
-      '<div class="tlc-yr" style="color:' + col + '">' + entry.s.y + '</div>' +
-      '<div class="tlc-sep" style="background:' + col + '55"></div>' +
+    '<div class="tlc-in" style="' + bgStyle + '">' +
+      '<div class="tlc-yr" style="color:' + (entry.playerColor ? entry.playerColor[0] : genreCol) + '">' + entry.s.y + '</div>' +
+      '<div class="tlc-sep" style="background:' + (entry.playerColor ? entry.playerColor[0] + '88' : genreCol + '55') + '"></div>' +
       '<div class="tlc-title">' + esc(entry.s.t) + '</div>' +
     '</div>';
   return d;
@@ -981,12 +1091,17 @@ function renderOthers() {
       var entry = p.tl[j];
       var col = gc(entry.s.g);
       var c = document.createElement("div");
-      c.className = "tlc";
+      c.className = "tlc" + (entry.playerColor ? " player-card" : "");
       c.style.height = "110px";
+      var bgMini = entry.playerColor
+        ? 'background:linear-gradient(145deg,' + entry.playerColor[0] + '44,' + entry.playerColor[1] + '22);height:110px'
+        : 'background:linear-gradient(145deg,' + col + '33,' + col + '16);height:110px';
+      var yrCol = entry.playerColor ? entry.playerColor[0] : col;
+      var sepCol = entry.playerColor ? entry.playerColor[0] + '88' : col + '55';
       c.innerHTML =
-        '<div class="tlc-in" style="background:linear-gradient(145deg,' + col + '33,' + col + '16);height:110px">' +
-          '<div class="tlc-yr" style="color:' + col + ';font-size:20px">' + entry.s.y + '</div>' +
-          '<div class="tlc-sep" style="background:' + col + '55"></div>' +
+        '<div class="tlc-in" style="' + bgMini + '">' +
+          '<div class="tlc-yr" style="color:' + yrCol + ';font-size:20px">' + entry.s.y + '</div>' +
+          '<div class="tlc-sep" style="background:' + sepCol + '"></div>' +
           '<div class="tlc-title">' + esc(entry.s.t) + '</div>' +
         '</div>';
       tr.appendChild(c);
@@ -1110,7 +1225,7 @@ function doFlip() {
     S.lastOk = ok;
     if (ok) {
       // Insert and keep sorted
-      p.tl.push({ s: song });
+      p.tl.push({ s: song, playerColor: [p.ca, p.cb] });
       p.tl.sort(function(a, b) { return a.s.y - b.s.y; });
       p.score++;
     }
@@ -1160,7 +1275,7 @@ function showReveal(song, ok, chosenPos, newScore) {
   if (ok) {
     note.className = "rev-note hidden";
     scrow.className = "rev-scrow";
-    document.getElementById("rev-scval").textContent = newScore + "/10";
+    document.getElementById("rev-scval").textContent = newScore + "/" + S.maxScore;
   } else {
     var p = S.players[S.idx];
     var valid = getValidPositions(song.y, p.tl);
@@ -1179,14 +1294,84 @@ function closeReveal() {
   document.getElementById("rev-ov").classList.remove("show");
 
   var p = S.players[S.idx];
-  if (p.score >= 10) { S.phase = "won"; showWin(); return; }
 
+  // ── Check if this player just hit the target ──────────────────
+  if (p.score >= S.maxScore) {
+
+    // If already in tiebreaker: first to pull ahead wins
+    if (S.tiebreaker) {
+      // Check if anyone else in tiePlayers also has same score
+      var others = S.tiePlayers.filter(function(ti) { return ti !== S.idx; });
+      var stillTied = others.some(function(ti) {
+        return S.players[ti].score >= S.maxScore;
+      });
+      if (!stillTied) {
+        // This player broke the tie — they win!
+        S.phase = "won";
+        showWin();
+        return;
+      }
+      // Still tied — tiebreaker continues among those who hit the new max
+      var newMax = p.score;
+      S.tiePlayers = S.players.reduce(function(acc, pl, i) {
+        if (pl.score >= newMax) acc.push(i);
+        return acc;
+      }, []);
+    } else {
+      // Normal play: check if this is the end of the round (everyone has had a turn)
+      // "End of round" = we've gone around once since the first player hit maxScore
+      // Simple approach: check after EVERY player's turn if multiple are tied at maxScore
+
+      // Advance turn first to see who else is at maxScore after this round completes
+      // We mark that maxScore was reached this turn
+      S._triggerIdx = S._triggerIdx !== undefined ? S._triggerIdx : S.idx;
+
+      // Collect all players at maxScore after next advance
+      var nextIdx = (S.idx + 1) % S.players.length;
+
+      // If we've gone all the way around (back to trigger), resolve
+      if (nextIdx === S._triggerIdx || S.players.length === 1) {
+        var atMax = [];
+        for (var k = 0; k < S.players.length; k++) {
+          if (S.players[k].score >= S.maxScore) atMax.push(k);
+        }
+        if (atMax.length === 1) {
+          S.phase = "won";
+          showWin();
+          return;
+        }
+        // Multiple players at max → tiebreaker!
+        S.tiebreaker = true;
+        S.tiePlayers = atMax;
+        S.maxScore = p.score + 1; // next target
+        S._triggerIdx = undefined;
+        S.idx = nextIdx;
+        S.card = S.deck.shift() || null;
+        S.pos = null; S.lastOk = null;
+        if (!S.card) { S.phase = "won"; showWin(); return; }
+        S.phase = "playing";
+        renderGame();
+        return;
+      }
+    }
+  }
+
+  // ── Normal turn advance ───────────────────────────────────────
   S.idx = (S.idx + 1) % S.players.length;
+
+  // In tiebreaker, skip players not in tiePlayers
+  if (S.tiebreaker) {
+    var safety = 0;
+    while (S.tiePlayers.indexOf(S.idx) === -1 && safety++ < S.players.length) {
+      S.idx = (S.idx + 1) % S.players.length;
+    }
+  }
+
   S.card = S.deck.shift() || null;
   S.pos = null;
   S.lastOk = null;
 
-  if (!S.card) { endGame(); return; }
+  if (!S.card) { S.phase = "won"; showWin(); return; }
 
   S.phase = "playing";
   renderGame();
@@ -1213,19 +1398,16 @@ function showWin() {
 
   document.getElementById("win-sub").innerHTML =
     '<span class="win-name">' + esc(winner.name) + '</span> venceu com ' +
-    winner.score + ' ponto' + (winner.score !== 1 ? 's' : '') + '!';
+    winner.score + ' ponto' + (winner.score !== 1 ? 's' : '') + (S.tiebreaker ? ' (via desempate)' : '') + '!';
 
-  var medals = ["🥇","🥈","🥉","4\u00ba"];
+  var medals = ["🥇","🥈","🥉","4º","5º","6º","7º","8º","9º","10º"];
   var sb = document.getElementById("sboard");
   sb.innerHTML = "";
 
   for (var i = 0; i < sorted.length; i++) {
     var p = sorted[i];
     var isW = (i === 0);
-    var r = p.score >= 10 ? {l:"CAMPEÃO",c:"#F59E0B"}
-          : p.score >= 7  ? {l:"EXPERT", c:"#8B5CF6"}
-          : p.score >= 5  ? {l:"CRAQUE", c:"#10B981"}
-          :                 {l:"NOVATO", c:"#60A5FA"};
+
     var row = document.createElement("div");
     row.className = "srow" + (isW ? " wr" : "");
     row.innerHTML =
@@ -1235,7 +1417,7 @@ function showWin() {
         '<div class="srow-name">' + esc(p.name) + '</div>' +
         '<div class="srow-rank" style="color:' + r.c + ';border-color:' + r.c + '55">' + r.l + '</div>' +
       '</div>' +
-      '<div><span class="srow-num">' + p.score + '</span><span class="srow-den">/10</span></div>';
+      '<div><span class="srow-num">' + p.score + '</span><span class="srow-den">/' + S.maxScore + '</span></div>';
     sb.appendChild(row);
   }
 
@@ -1265,12 +1447,19 @@ function restartGame() {
     S.players[i].tl = [{ s: seed }];
     S.players[i].score = 1;
   }
+  S.players = shuffle(S.players); // re-randomize order
   S.deck = deck;
   S.idx = 0;
   S.card = S.deck.shift();
   S.pos = null;
   S.phase = "playing";
   S.lastOk = null;
+  S.tiebreaker = false;
+  S.tiePlayers = [];
+  S._triggerIdx = undefined;
+  // reset max from select
+  var rs2 = document.getElementById("rounds-select");
+  if (rs2) S.maxScore = parseInt(rs2.value);
   showScreen("game");
   renderGame();
 }
