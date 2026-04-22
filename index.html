@@ -102,11 +102,11 @@ body::before{
 .cg-stripe{display:flex;align-items:center;gap:6px;padding:9px 13px 8px;border-bottom:1px solid rgba(255,255,255,.05)}
 .cg-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
 .cg-lbl{font-size:9px;font-weight:700;letter-spacing:1.6px;text-transform:uppercase}
-.cfront-body{flex:1;display:flex;flex-direction:column;justify-content:center;padding:13px;position:relative;overflow:hidden}
+.cfront-body{flex:1;display:flex;flex-direction:column;justify-content:center;padding:15px;position:relative;overflow:hidden}
 .cwm{position:absolute;right:-10px;bottom:-10px;font-size:90px;line-height:1;opacity:.05;pointer-events:none;user-select:none;font-family:serif}
-.ctitle{font-family:var(--fh);font-size:16px;font-weight:800;color:var(--t0);letter-spacing:-.02em;line-height:1.25;margin-bottom:9px;position:relative;z-index:1;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.ctitle{font-family:var(--fh);font-size:20px;font-weight:800;color:var(--t0);letter-spacing:-.02em;line-height:1.25;margin-bottom:9px;position:relative;z-index:1;display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden}
 .csep{width:26px;height:2px;border-radius:1px;background:rgba(255,255,255,.18);margin-bottom:9px}
-.cartist{font-size:10px;font-weight:500;color:rgba(255,255,255,.48);letter-spacing:.06em;text-transform:uppercase;position:relative;z-index:1;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.cartist{font-size:13px;font-weight:500;color:rgba(255,255,255,.48);letter-spacing:.04em;text-transform:uppercase;position:relative;z-index:1;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .cfront-foot{padding:9px 13px;border-top:1px solid rgba(255,255,255,.05);text-align:center}
 .flip-hint{font-size:9px;letter-spacing:1.4px;text-transform:uppercase;color:rgba(255,255,255,.22)}
 .cback{transform:rotateY(180deg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;box-shadow:0 8px 32px rgba(0,0,0,.55)}
@@ -767,7 +767,17 @@ var PGRADS = [
   ["#0891B2","#38BDF8"],
   ["#059669","#34D399"],
   ["#BE185D","#9D174D"],
-  ["#1D4ED8","#1E40AF"]
+  ["#1D4ED8","#1E40AF"],
+  ["#854D0E","#713F12"],
+  ["#065F46","#064E3B"],
+  ["#7E22CE","#581C87"],
+  ["#9F1239","#881337"],
+  ["#0C4A6E","#083344"],
+  ["#166534","#14532D"],
+  ["#C2410C","#9A3412"],
+  ["#0F766E","#134E4A"],
+  ["#6D28D9","#4C1D95"],
+  ["#1E3A8A","#172554"]
 ];
 
 /* ══════════════════════════════════════════════════════
@@ -776,7 +786,7 @@ var PGRADS = [
 ══════════════════════════════════════════════════════ */
 var S = {
   pc: 2,
-  pnames: ["Jogador 1","Jogador 2","Jogador 3","Jogador 4","Jogador 5","Jogador 6","Jogador 7","Jogador 8","Jogador 9","Jogador 10"],
+  pnames: ["Jogador 1","Jogador 2","Jogador 3","Jogador 4","Jogador 5","Jogador 6","Jogador 7","Jogador 8","Jogador 9","Jogador 10","Jogador 11","Jogador 12","Jogador 13","Jogador 14","Jogador 15","Jogador 16","Jogador 17","Jogador 18","Jogador 19","Jogador 20"],
   players: [],   // {name, tl:[{s:song}], score, ca, cb}
   idx: 0,
   deck: [],
@@ -949,7 +959,7 @@ function renderPBar() {
     div.innerHTML =
       '<div class="ptab-av" style="background:linear-gradient(135deg,' + p.ca + ',' + p.cb + ')">' + p.name.charAt(0).toUpperCase() + '</div>' +
       '<div class="ptab-name">' + esc(p.name) + '</div>' +
-      '<div class="ptab-sc">' + p.score + '/10</div>' +
+      '<div class="ptab-sc">' + p.score + '/' + S.maxScore + '</div>' +
       '<div class="ptab-bar"></div>';
     bar.appendChild(div);
   }
@@ -1088,7 +1098,7 @@ function renderOthers() {
     wrap.innerHTML =
       '<div class="ocard-head">' +
         '<span class="ocard-name">' + esc(p.name) + '</span>' +
-        '<span class="ocard-score">' + p.score + '/10</span>' +
+        '<span class="ocard-score">' + p.score + '/' + S.maxScore + '</span>' +
       '</div>';
 
     var scroll = document.createElement("div");
@@ -1404,84 +1414,97 @@ function closeReveal() {
 
   var p = S.players[S.idx];
 
-  // ── Check if this player just hit the target ──────────────────
-  if (p.score >= S.maxScore) {
+  // ── TIEBREAKER MODE ───────────────────────────────────────────
+  if (S.tiebreaker) {
+    // Winner = the tied player who is now strictly ahead of ALL others
+    // (score > every other tied player's score)
+    var myScore = p.score;
+    var isBehind = false;
+    for (var k = 0; k < S.tiePlayers.length; k++) {
+      var ti = S.tiePlayers[k];
+      if (ti !== S.idx && S.players[ti].score >= myScore) {
+        isBehind = true;
+        break;
+      }
+    }
+    if (!isBehind) {
+      // This tied player is now strictly ahead — they win
+      S.phase = "won";
+      showWin();
+      return;
+    }
+    // Still tied — advance to next TIED player only
+    var next = S.idx;
+    var safety2 = 0;
+    do {
+      next = (next + 1) % S.players.length;
+      safety2++;
+    } while (S.tiePlayers.indexOf(next) === -1 && safety2 < S.players.length);
 
-    // If already in tiebreaker: first to pull ahead wins
-    if (S.tiebreaker) {
-      // Check if anyone else in tiePlayers also has same score
-      var others = S.tiePlayers.filter(function(ti) { return ti !== S.idx; });
-      var stillTied = others.some(function(ti) {
-        return S.players[ti].score >= S.maxScore;
-      });
-      if (!stillTied) {
-        // This player broke the tie — they win!
+    if (safety2 >= S.players.length) {
+      // Should never happen — safety valve
+      S.phase = "won"; showWin(); return;
+    }
+    S.idx = next;
+    S.card = S.deck.shift() || null;
+    S.pos = null; S.lastOk = null;
+    if (!S.card) { S.phase = "won"; showWin(); return; }
+    S.phase = "playing";
+    renderGame();
+    return;
+  }
+
+  // ── NORMAL MODE ───────────────────────────────────────────────
+  if (p.score >= S.maxScore) {
+    // Give every other player who hasn't yet played this round a chance.
+    if (S._roundTriggerIdx === undefined || S._roundTriggerIdx === null) {
+      S._roundTriggerIdx = S.idx;
+    }
+
+    var nextIdx = (S.idx + 1) % S.players.length;
+
+    if (nextIdx === S._roundTriggerIdx) {
+      // Full cycle complete — collect everyone at maxScore
+      var atMax = [];
+      for (var i = 0; i < S.players.length; i++) {
+        if (S.players[i].score >= S.maxScore) atMax.push(i);
+      }
+      S._roundTriggerIdx = undefined;
+
+      if (atMax.length === 1) {
         S.phase = "won";
         showWin();
         return;
       }
-      // Still tied — tiebreaker continues among those who hit the new max
-      var newMax = p.score;
-      S.tiePlayers = S.players.reduce(function(acc, pl, i) {
-        if (pl.score >= newMax) acc.push(i);
-        return acc;
-      }, []);
-    } else {
-      // Normal play: check if this is the end of the round (everyone has had a turn)
-      // "End of round" = we've gone around once since the first player hit maxScore
-      // Simple approach: check after EVERY player's turn if multiple are tied at maxScore
 
-      // Advance turn first to see who else is at maxScore after this round completes
-      // We mark that maxScore was reached this turn
-      S._triggerIdx = S._triggerIdx !== undefined ? S._triggerIdx : S.idx;
-
-      // Collect all players at maxScore after next advance
-      var nextIdx = (S.idx + 1) % S.players.length;
-
-      // If we've gone all the way around (back to trigger), resolve
-      if (nextIdx === S._triggerIdx || S.players.length === 1) {
-        var atMax = [];
-        for (var k = 0; k < S.players.length; k++) {
-          if (S.players[k].score >= S.maxScore) atMax.push(k);
-        }
-        if (atMax.length === 1) {
-          S.phase = "won";
-          showWin();
-          return;
-        }
-        // Multiple players at max → tiebreaker!
-        S.tiebreaker = true;
-        S.tiePlayers = atMax;
-        S.maxScore = p.score + 1; // next target
-        S._triggerIdx = undefined;
-        S.idx = nextIdx;
-        S.card = S.deck.shift() || null;
-        S.pos = null; S.lastOk = null;
-        if (!S.card) { S.phase = "won"; showWin(); return; }
-        S.phase = "playing";
-        renderGame();
-        return;
-      }
+      // Multiple players tied → TIEBREAKER
+      S.tiebreaker = true;
+      S.tiePlayers = atMax.slice();
+      S.idx = atMax[0];
+      S.card = S.deck.shift() || null;
+      S.pos = null; S.lastOk = null;
+      if (!S.card) { S.phase = "won"; showWin(); return; }
+      S.phase = "playing";
+      renderGame();
+      return;
     }
+
+    // Round not complete — next player plays normally
+    S.idx = nextIdx;
+    S.card = S.deck.shift() || null;
+    S.pos = null; S.lastOk = null;
+    if (!S.card) { S.phase = "won"; showWin(); return; }
+    S.phase = "playing";
+    renderGame();
+    return;
   }
 
-  // ── Normal turn advance ───────────────────────────────────────
+  // ── Standard turn advance ─────────────────────────────────────
   S.idx = (S.idx + 1) % S.players.length;
-
-  // In tiebreaker, skip players not in tiePlayers
-  if (S.tiebreaker) {
-    var safety = 0;
-    while (S.tiePlayers.indexOf(S.idx) === -1 && safety++ < S.players.length) {
-      S.idx = (S.idx + 1) % S.players.length;
-    }
-  }
-
   S.card = S.deck.shift() || null;
   S.pos = null;
   S.lastOk = null;
-
   if (!S.card) { S.phase = "won"; showWin(); return; }
-
   S.phase = "playing";
   renderGame();
 }
@@ -1513,13 +1536,18 @@ function showWin() {
     '<span class="win-name">' + esc(winner.name) + '</span> venceu com ' +
     winner.score + ' ponto' + (winner.score !== 1 ? 's' : '') + (S.tiebreaker ? ' (via desempate)' : '') + '!';
 
-  var medals = ["🥇","🥈","🥉","4º","5º","6º","7º","8º","9º","10º"];
+  var medals = ["🥇","🥈","🥉","4º","5º","6º","7º","8º","9º","10º","11º","12º","13º","14º","15º","16º","17º","18º","19º","20º"];
   var sb = document.getElementById("sboard");
   sb.innerHTML = "";
 
   for (var i = 0; i < sorted.length; i++) {
     var p = sorted[i];
     var isW = (i === 0);
+    var maxS = S.maxScore;
+    var r = p.score >= maxS               ? {l:"CAMPEÃO", c:"#F59E0B"}
+          : p.score >= Math.ceil(maxS*.7) ? {l:"EXPERT",  c:"#8B5CF6"}
+          : p.score >= Math.ceil(maxS*.5) ? {l:"CRAQUE",  c:"#10B981"}
+          :                                 {l:"NOVATO",  c:"#60A5FA"};
 
     var row = document.createElement("div");
     row.className = "srow" + (isW ? " wr" : "");
